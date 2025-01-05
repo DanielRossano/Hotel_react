@@ -1,0 +1,3 @@
+[submodule "SubModulo-Hotel"]
+	path = SubModulo-Hotel
+	url = https://github.com/DanielRossano/SubModulo-Hotel.git

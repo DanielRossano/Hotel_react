@@ -1,0 +1,48 @@
+/* Header */
+.header {
+  height: 60px;
+  background-color: #005f73; /* Paleta de cores */
+  color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center; /* Centraliza horizontalmente */
+  align-items: center; /* Centraliza verticalmente */
+  position: relative; /* Necessário para ajustar o botão de hambúrguer */
+}
+
+/* Botão de hambúrguer */
+.hamburger-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 24px;
+  cursor: pointer;
+  padding: 0; /* Para posicionar o botão no lado esquerdo */
+  left: 20px;
+  position: absolute;
+}
+
+/* Ícone do botão de hambúrguer */
+.hamburger-icon span {
+  display: block;
+  width: 30px;
+  height: 3px;
+  background-color: white;
+  border-radius: 2px;
+}
+
+.hamburger-icon span:not(:last-child) {
+  margin-bottom: 5px;
+}
+
+/* Estilo para h1 centralizado */
+.header h1 {
+  font-family: 'Arial', sans-serif; /* Fonte alterada */
+  font-size: 24px; /* Tamanho da fonte */
+  font-weight: bold; /* Peso da fonte */
+  margin: 0;
+  color: #ffffff;
+  text-align: center; /* Centraliza o texto horizontalmente */
+  width: 100%; /* Garante que o h1 ocupe toda a largura do header */
+}
