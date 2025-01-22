@@ -22,7 +22,7 @@ body {
 /* Cabeçalho */
 h1 {
   font-size: 24px;
-  color: #444;
+  color: #004080; /* Azul-escuro */
   margin-bottom: 20px;
   text-align: center;
 }
@@ -30,64 +30,74 @@ h1 {
 /* Botões de navegação */
 button.btn-outline-primary {
   background-color: #fff;
-  color: #007bff; /* Azul para os botões */
-  border: 1px solid #007bff;
+  color: #004080; /* Azul-escuro */
+  border: 1px solid #004080;
   padding: 8px 12px;
   border-radius: 4px;
   transition: all 0.3s ease-in-out;
 }
 
 button.btn-outline-primary:hover {
-  background-color: #007bff;
+  background-color: #004080;
   color: #fff; /* Branco no hover */
 }
 
 /* Tabela */
 .table {
-  width: 100%;
-  border-collapse: collapse; /* Remove espaços entre bordas */
+  border-collapse: collapse; /* Remove espaçamento entre as células */
   table-layout: fixed; /* Colunas com largura fixa */
+  width: 100%;
 }
 
-/* Cabeçalho da tabela */
-.table thead th {
-  background-color: #000000; /* Cor do cabeçalho */
-  color: #fff; /* Texto branco */
+.table th {
+  background-color: #004080; /* Azul-escuro */
+  color: #ffffff; /* Texto branco */
   text-align: center;
-  padding: 4px;
+  padding: 8px;
   font-weight: bold;
-  border-top: 1px solid #ddd; /* Borda superior */
-  border-bottom: 1px solid #ddd; /* Borda inferior */
+  border-top: 1px solid #000000; /* Borda superior */
+  border-bottom: 1px solid #000000; /* Borda inferior */
 }
 
-/* Linhas da tabela */
-.table tbody td {
-  text-align: left;
+.table td {
+  position: relative;
+  white-space: nowrap; /* Impede quebra de linha */
+  overflow: hidden; /* Esconde o texto excedente */
+  text-overflow: ellipsis; /* Adiciona reticências para indicar corte */
   padding: 4px;
-  border-top: 1px solid #ddd; /* Borda superior */
-  border-bottom: 1px solid #ddd; /* Borda inferior */
-  vertical-align: middle;
-  font-size: 14px;
+  text-align: center;
+  font-size: 12px;
 }
 
 /* Células Disponíveis */
-.table tbody td.available {
-  background-color: #e6ffe6; /* Verde claro */
+.table td.available {
+  background-color: #e8faff; /* Verde-claro */
+  color: #000000; /* Preto */
   cursor: pointer;
 }
 
-.table tbody td.available:hover {
+.table td.available:hover {
   background-color: #c3f0c3; /* Verde mais escuro no hover */
 }
 
 /* Células Reservadas */
-.table tbody td.reserved {
-  background-color: #ffe6e6; /* Vermelho claro */
+.table td.reserved {
+  background-color: #FFD580; /* Laranja-claro */
+  border-right: #ffffff 1px solid; /* Borda lateral */
+  color: #000000; /* Preto */
   cursor: pointer;
 }
 
-.table tbody td.reserved:hover {
-  background-color: #f2bcbc; /* Vermelho mais escuro no hover */
+
+.table td.reserved:hover {
+  background-color: #ffc14d; /* Laranja mais escuro no hover */
+}
+
+/* Remove bordas laterais */
+.table td, 
+.table th {
+  border-left: none;
+  border-right: none;
 }
 
 /* Modal */
@@ -97,10 +107,9 @@ button.btn-outline-primary:hover {
 }
 
 .modal-header {
-  background-color: #007bff;
-  color: #fff;
+  background-color: #ffffff;
   padding: 15px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #000000;
 }
 
 .modal-title {
@@ -119,8 +128,7 @@ button.btn-outline-primary:hover {
 }
 
 .modal-footer .btn-primary {
-  background-color: #007bff;
-  color: #fff;
+  background-color: #ffffff;
 }
 
 /* Estilos Responsivos */
@@ -130,7 +138,7 @@ button.btn-outline-primary:hover {
     padding: 8px;
   }
 
-  .table tbody td {
+  .table td {
     font-size: 12px;
     padding: 8px;
   }

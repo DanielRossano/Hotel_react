@@ -135,26 +135,85 @@ const ReservationsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {rooms.map((room) => (
-              <tr key={room.id}>
-                <td>{room.name}</td>
-                {daysOfMonth.map((day) => {
-                  const reservation = getReservation(room.id, day.format("YYYY-MM-DD"));
+  {rooms.map((room) => {
+    const reservationsForRoom = reservations.filter(
+      (res) => res.room_id === room.id
+    );
 
-                  return (
-                    <td
-                      key={`${room.id}-${day.format("YYYY-MM-DD")}`}
-                      className={reservation ? "reserved" : "available"}
-                      onClick={() => handleCellClick(room.id, day.format("YYYY-MM-DD"))}
-                      style={{ cursor: "pointer" }}
-                    >
-                      {reservation ? reservation.guest_name : ""}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
+    return (
+      <tr key={room.id}>
+  <td>{room.name}</td>
+  {(() => {
+    let cells = [];
+    let dayIndex = 0;
+
+    while (dayIndex < daysOfMonth.length) {
+      const day = daysOfMonth[dayIndex];
+      const currentReservation = reservationsForRoom.find((res) =>
+        moment(day).isBetween(res.start_date, res.end_date, "day", "[]")
+      );
+
+      if (currentReservation) {
+        // Cálculo do número de dias consecutivos para esta reserva
+        const reservationDays = daysOfMonth.filter((d) =>
+          moment(d).isBetween(
+            currentReservation.start_date,
+            currentReservation.end_date,
+            "day",
+            "[]"
+          )
+        );
+
+        const colspan = reservationDays.length;
+
+        // Adiciona a célula agrupada
+        cells.push(
+          <td
+            key={`${room.id}-${day.format("YYYY-MM-DD")}`}
+            colSpan={colspan}
+            className="reserved"
+            onClick={() =>
+              handleCellClick(room.id, day.format("YYYY-MM-DD"))
+            }
+            style={{
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: `${colspan * 100}px`, // Ajusta largura conforme o número de células
+            }}
+            title={currentReservation.guest_name}
+          >
+            {currentReservation.guest_name}
+          </td>
+        );
+
+        // Avança o índice para pular os dias da reserva já processados
+        dayIndex += colspan;
+      } else {
+        // Adiciona células disponíveis
+        cells.push(
+          <td
+            key={`${room.id}-${day.format("YYYY-MM-DD")}`}
+            className="available"
+            onClick={() =>
+              handleCellClick(room.id, day.format("YYYY-MM-DD"))
+            }
+            style={{ cursor: "pointer" }}
+          ></td>
+        );
+        dayIndex++;
+      }
+    }
+
+    return cells;
+  })()}
+</tr>
+
+    );
+  })}
+</tbody>
+
         </table>
       </div>
 

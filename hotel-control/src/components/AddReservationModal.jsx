@@ -93,6 +93,20 @@ const AddReservationModal = ({
                   ))}
                 </select>
               </div>
+                {/* Campo Quarto */}
+                <div className="mb-3">
+                <label htmlFor="room_id" className="form-label">
+                  Quarto
+                </label>
+                <input
+                  type="text"
+                  id="room_id"
+                  name="room_id"
+                  className="form-control"
+                  value={newReservation.room_id}
+                  readOnly
+                />
+                </div>
 
               {/* Data de Início */}
               <div className="mb-3">
