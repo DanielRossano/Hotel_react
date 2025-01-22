@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { fetchRooms, createRoom } from "../services/rooms";
+import { fetchRooms, createRoom } from "../services/roomsFunctions";
 import api from "../services/api"; // Para chamadas personalizadas, como edição
 import '../styles/rooms.css'; // Estilos customizados, se necessário
 import { toast, ToastContainer } from "react-toastify";

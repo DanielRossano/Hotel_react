@@ -17,7 +17,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         {/* Navegação */}
         <nav>
           <ul>
-            <li><a href="/">Dashboard</a></li>
+            <li><a href="/Addreservations">Dashboard</a></li>
             <li><a href="/rooms">Quartos</a></li>
             <li><a href="/reservations">Reservas</a></li>
             <li><a href="/guests">Hóspedes</a></li>

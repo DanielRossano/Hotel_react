@@ -10,6 +10,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import ReservationsPage from './pages/ReservationsPage';
 import './App.css';
 import RoomsPage from './pages/RoomsPage';
+import AddReservation from './pages/AddReservation';
 
 const App = () => (
   <Router>
@@ -21,6 +22,7 @@ const App = () => (
           <Routes>
             <Route path="/guests" element={<GuestsPage />} />
             <Route path="/reservations" element={<ReservationsPage />} />
+            <Route path="/Addreservations" element={<AddReservation/>} />
             <Route path="/rooms" element={<RoomsPage />} />
             {/* Adicione outras rotas aqui */}
           </Routes>

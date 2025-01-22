@@ -5,63 +5,137 @@ const db = require('../db/connection');
 // Listar todos os hóspedes
 router.get('/', async (req, res) => {
   const { search, type } = req.query;
+try {
+  let query = 'SELECT * FROM guests';
+  const queryParams = [];
 
-  try {
-    let query = 'SELECT * FROM guests WHERE 1=1';
-    const params = [];
-
-    if (search) {
-      query += ' AND (name LIKE ? OR cpf_cnpj LIKE ?)';
-      params.push(`%${search}%`, `%${search}%`);
-    }
-    if (type) {
-      query += ' AND type = ?';
-      params.push(type);
-    }
-
-    const [rows] = await db.query(query, params);
-    res.json(rows);
-  } catch (error) {
-    console.error('Erro ao buscar hóspedes:', error);
-    res.status(500).json({ error: error.message });
+  if (search) {
+    query += ' WHERE name LIKE ? OR cpf_cnpj LIKE ?';
+    queryParams.push(`%${search}%`, `%${search}%`);
   }
-});
 
+  if (type) {
+    query += search ? ' AND type = ?' : ' WHERE type = ?';
+    queryParams.push(type);
+  }
+
+  const [rows] = await db.query(query, queryParams);
+  res.json(rows);
+} catch (error) {
+  console.error('Erro ao listar hóspedes:', error);
+  res.status(500).json({ error: error.message });
+}
+});
 // Cadastrar novo hóspede
 router.post('/', async (req, res) => {
-  const { name, cpf_cnpj, address, nome_fantasia, type } = req.body;
+  const {
+    name,
+    cpf_cnpj,
+    type,
+    address: { estado, cidade, bairro, rua, numero, cep } = {},
+    nome_fantasia,
+  } = req.body;
 
-  if (!name || !cpf_cnpj || !type) {
-    return res.status(400).json({ error: 'Nome, CPF/CNPJ e tipo são obrigatórios.' });
+  // Verificação adicional
+  if (!name || !cpf_cnpj || type === undefined) {
+    return res
+      .status(400)
+      .json({ error: 'Nome, CPF/CNPJ e tipo são obrigatórios.' });
   }
 
+  // Certifique-se de que "type" está no formato esperado (0 ou 1)
+  const guestType = type === "fisica" ? 0 : 1;
+
   try {
-    const fullAddress = JSON.stringify(address); // Serializar o endereço para texto
     const [result] = await db.query(
-      'INSERT INTO guests (name, cpf_cnpj, address, nome_fantasia, type) VALUES (?, ?, ?, ?, ?)',
-      [name, cpf_cnpj, fullAddress, nome_fantasia || null, type]
+      `
+      INSERT INTO guests (name, cpf_cnpj, estado, cidade, bairro, rua, numero, cep, nome_fantasia, type) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        name,
+        cpf_cnpj,
+        estado || null,
+        cidade || null,
+        bairro || null,
+        rua || null,
+        numero || null,
+        cep || null,
+        nome_fantasia || null,
+        guestType,
+      ]
     );
-    res.status(201).json({ id: result.insertId, name, cpf_cnpj, address, nome_fantasia, type });
+
+    res.status(201).json({
+      id: result.insertId,
+      name,
+      cpf_cnpj,
+      estado,
+      cidade,
+      bairro,
+      rua,
+      numero,
+      cep,
+      nome_fantasia,
+      type: guestType,
+    });
   } catch (error) {
     console.error('Erro ao cadastrar hóspede:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
+
 // Atualizar hóspede
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { name, cpf_cnpj, address, nome_fantasia, type } = req.body;
+  const {
+    name,
+    cpf_cnpj,
+    estado,
+    cidade,
+    bairro,
+    rua,
+    numero,
+    cep,
+    nome_fantasia,
+    type,
+  } = req.body;
 
-  if (!name || !cpf_cnpj || !type) {
+  if (!name || !cpf_cnpj || type === undefined) {
     return res.status(400).json({ error: 'Nome, CPF/CNPJ e tipo são obrigatórios.' });
   }
 
   try {
-    const fullAddress = JSON.stringify(address);
     const [result] = await db.query(
-      'UPDATE guests SET name = ?, cpf_cnpj = ?, address = ?, nome_fantasia = ?, type = ? WHERE id = ?',
-      [name, cpf_cnpj, fullAddress, nome_fantasia || null, type, id]
+      `
+      UPDATE guests 
+      SET 
+        name = ?, 
+        cpf_cnpj = ?, 
+        estado = ?, 
+        cidade = ?, 
+        bairro = ?, 
+        rua = ?, 
+        numero = ?, 
+        cep = ?, 
+        nome_fantasia = ?, 
+        type = ? 
+      WHERE id = ?
+      `,
+      [
+        name,
+        cpf_cnpj,
+        estado,
+        cidade,
+        bairro,
+        rua,
+        numero,
+        cep,
+        nome_fantasia || null,
+        type === "fisica" ? 0 : 1, // Converter para booleano
+        id,
+      ]
     );
 
     if (result.affectedRows === 0) {
@@ -77,21 +151,6 @@ router.put('/:id', async (req, res) => {
 
 // Deletar hóspede
 router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const [result] = await db.query('DELETE FROM guests WHERE id = ?', [id]);
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Hóspede não encontrado.' });
-    }
-
-    res.json({ message: 'Hóspede excluído com sucesso.' });
-  } catch (error) {
-    console.error('Erro ao excluir hóspede:', error);
-    res.status(500).json({ error: error.message });
-  }
-});router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -120,6 +179,5 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 
 module.exports = router;

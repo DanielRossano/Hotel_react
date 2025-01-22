@@ -30,6 +30,26 @@ router.post('/', async (req, res) => {
   }
 
   try {
+    // Verificar conflito de datas para o quarto
+    const [conflictingReservations] = await db.query(
+      `
+      SELECT * FROM reservations 
+      WHERE room_id = ? 
+      AND (
+        (start_date <= ? AND end_date >= ?) OR 
+        (start_date <= ? AND end_date >= ?) OR 
+        (start_date >= ? AND end_date <= ?)
+      )
+      `,
+      [room_id, end_date, start_date, start_date, end_date, start_date, end_date]
+    );
+
+    if (conflictingReservations.length > 0) {
+      return res.status(400).json({
+        error: 'O quarto já está reservado para o período selecionado.',
+      });
+    }
+
     // Calcular total de diárias
     const start = new Date(start_date);
     const end = new Date(end_date);
@@ -66,29 +86,59 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Atualizar o valor pago
-router.put('/:id/payment', async (req, res) => {
+router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { amount_paid } = req.body;
+  const { room_id, guest_id, start_date, end_date, daily_rate } = req.body;
 
-  if (amount_paid == null) {
-    return res.status(400).json({ error: 'Valor pago é obrigatório.' });
+  if (!room_id || !guest_id || !start_date || !end_date || !daily_rate) {
+    return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
   }
 
   try {
-    // Atualizar o valor pago na reserva
+    const start = new Date(start_date);
+    const end = new Date(end_date);
+    const days = (end - start) / (1000 * 60 * 60 * 24);
+
+    if (days <= 0) {
+      return res.status(400).json({ error: 'Datas inválidas.' });
+    }
+
+    const total_amount = days * daily_rate;
+
     const [result] = await db.query(
-      'UPDATE reservations SET amount_paid = ? WHERE id = ?',
-      [amount_paid, id]
+      `
+      UPDATE reservations 
+      SET room_id = ?, guest_id = ?, start_date = ?, end_date = ?, daily_rate = ?, total_amount = ? 
+      WHERE id = ?
+      `,
+      [room_id, guest_id, start_date, end_date, daily_rate, total_amount, id]
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Reserva não encontrada' });
+      return res.status(404).json({ error: 'Reserva não encontrada.' });
     }
 
-    res.json({ message: 'Valor pago atualizado com sucesso.' });
+    res.json({ message: 'Reserva atualizada com sucesso.' });
   } catch (error) {
-    console.error('Erro ao atualizar pagamento:', error);
+    console.error('Erro ao atualizar reserva:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// exclui reserva
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [result] = await db.query('DELETE FROM reservations WHERE id = ?', [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Reserva não encontrada.' });
+    }
+
+    res.json({ message: 'Reserva cancelada com sucesso.' }); // Retorno claro
+  } catch (error) {
+    console.error('Erro ao cancelar reserva:', error);
     res.status(500).json({ error: error.message });
   }
 });

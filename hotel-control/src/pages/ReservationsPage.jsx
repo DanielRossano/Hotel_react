@@ -1,116 +1,174 @@
-import React, { useState, useEffect } from 'react';
-import moment from 'moment';
-import 'moment/locale/pt-br';
-import { fetchReservations } from '../services/reservationFunctions';
-import { fetchRooms } from '../services/rooms';
-import'../styles/ReservationsTimeline.css';   // Importa o arquivo de estilos
+import React, { useState, useEffect } from "react";
+import moment from "moment";
+import "moment/locale/pt-br";
+import AddReservationModal from "../components/AddReservationModal";
+import { loadRoomsAndReservations, createReservation, fetchGuests, handleDeleteReservation } from "../services/reservationsFunctions";
+import { toast } from "react-toastify";
+import "../styles/ReservationsPage.css";
 
-const ReservationsTimeline = () => {
+const ReservationsPage = () => {
   const [rooms, setRooms] = useState([]);
   const [reservations, setReservations] = useState([]);
-  const [startDate, setStartDate] = useState(moment().startOf('month').format('YYYY-MM-DD'));
-  const [endDate, setEndDate] = useState(moment().endOf('month').format('YYYY-MM-DD'));
-  const [filteredDates, setFilteredDates] = useState([]);
+  const [currentMonth, setCurrentMonth] = useState(moment());
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [guests, setGuests] = useState([]);
 
   useEffect(() => {
-    const generateDateRange = (start, end) => {
-      const dates = [];
-      let currentDate = moment(start);
-      while (currentDate <= moment(end)) {
-        dates.push(currentDate.format('YYYY-MM-DD'));
-        currentDate = currentDate.add(1, 'day');
-      }
-      return dates;
-    };
-
-    setFilteredDates(generateDateRange(startDate, endDate));
-  }, [startDate, endDate]);
-
-  useEffect(() => {
-    const loadRoomsAndReservations = async () => {
+    const fetchData = async () => {
       try {
-        // Buscar quartos
-        const roomsData = await fetchRooms();
-        setRooms(roomsData);
-
-        // Buscar reservas
-        const reservationsData = await fetchReservations();
-        setReservations(reservationsData);
+        const { rooms, reservations } = await loadRoomsAndReservations();
+        setRooms(rooms);
+        setReservations(reservations);
       } catch (error) {
-        console.error('Erro ao carregar dados:', error);
+        console.error("Erro ao carregar dados:", error);
+        toast.error("Erro ao carregar quartos e reservas.");
       }
     };
 
-    loadRoomsAndReservations();
+    fetchData();
   }, []);
 
+  const generateDaysOfMonth = () => {
+    const startOfMonth = currentMonth.clone().startOf("month");
+    const endOfMonth = currentMonth.clone().endOf("month");
+
+    const days = [];
+    let day = startOfMonth;
+
+    while (day <= endOfMonth) {
+      days.push(day.clone());
+      day.add(1, "day");
+    }
+
+    return days;
+  };
+
+  const getReservation = (roomId, date) => {
+    return reservations.find(
+      (reservation) =>
+        reservation.room_id === roomId &&
+        moment(date).isBetween(
+          reservation.start_date,
+          reservation.end_date,
+          "day",
+          "[]"
+        )
+    );
+  };
+
+  const handleMonthChange = (direction) => {
+    setCurrentMonth((prev) =>
+      direction === "prev"
+        ? prev.clone().subtract(1, "month")
+        : prev.clone().add(1, "month")
+    );
+  };
+
+  const handleCellClick = async (roomId, date) => {
+    const reservation = getReservation(roomId, date);
+
+    if (reservation) {
+      if (window.confirm("Deseja cancelar esta reserva?")) {
+        try {
+          await handleDeleteReservation(reservation.id);
+          setReservations((prev) => prev.filter((r) => r.id !== reservation.id));
+        } catch (error) {
+          console.error("Erro ao cancelar reserva:", error);
+        }
+      }
+    } else {
+      try {
+        const fetchedGuests = await fetchGuests();
+        setGuests(fetchedGuests);
+        setSelectedRoom(rooms.find((room) => room.id === roomId));
+        setSelectedDate(date);
+        setShowAddModal(true);
+      } catch (error) {
+        console.error("Erro ao carregar hóspedes:", error);
+        toast.error("Erro ao carregar lista de hóspedes.");
+      }
+    }
+  };
+
+  const handleAddReservation = async (reservation) => {
+    try {
+      const newReservation = await createReservation(reservation);
+      setReservations((prev) => [...prev, newReservation]);
+      setShowAddModal(false);
+      toast.success("Reserva cadastrada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao cadastrar reserva:", error);
+      toast.error("Erro ao cadastrar reserva. Tente novamente.");
+    }
+  };
+
+  const daysOfMonth = generateDaysOfMonth();
+
   return (
-    <div className="reservations-timeline">
-      <h1 className="text-center">Controle de Reservas</h1>
-
-      {/* Filtro por período */}
-      <div className="filters">
-        <label>
-          Data de:
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </label>
-        <label>
-          até:
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </label>
+    <div className="container reservations-page">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <button
+          className="btn btn-outline-primary"
+          onClick={() => handleMonthChange("prev")}
+        >
+          &lt; Mês Anterior
+        </button>
+        <h3>{currentMonth.format("MMMM YYYY")}</h3>
+        <button
+          className="btn btn-outline-primary"
+          onClick={() => handleMonthChange("next")}
+        >
+          Próximo Mês &gt;
+        </button>
       </div>
 
-      {/* Tabela de Linha do Tempo */}
-      <div className="timeline">
-        {/* Cabeçalho com datas */}
-        <div className="timeline-header">
-          <div className="timeline-room-column">Quarto</div>
-          {filteredDates.map((date) => (
-            <div key={date} className="timeline-date-column">
-              {moment(date).format('DD/MM')}
-            </div>
-          ))}
-        </div>
+      <div className="table-responsive">
+        <table className="table table-bordered">
+          <thead>
+            <tr>
+              <th>Quartos</th>
+              {daysOfMonth.map((day) => (
+                <th key={day.format("YYYY-MM-DD")}>{day.format("DD")}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rooms.map((room) => (
+              <tr key={room.id}>
+                <td>{room.name}</td>
+                {daysOfMonth.map((day) => {
+                  const reservation = getReservation(room.id, day.format("YYYY-MM-DD"));
 
-        {/* Linhas de quartos */}
-        {rooms.map((room) => (
-          <div key={room.id} className="timeline-row">
-            {/* Número do quarto */}
-            <div className="timeline-room-column">{room.name}</div>
-
-            {/* Colunas de reservas */}
-            {filteredDates.map((date) => {
-              const reservation = reservations.find(
-                (res) =>
-                  res.room_id === room.id &&
-                  moment(date).isBetween(res.start_date, res.end_date, 'day', '[]')
-              );
-
-              return (
-                <div
-                  key={date}
-                  className={`timeline-date-column ${
-                    reservation ? 'reserved' : ''
-                  }`}
-                  title={reservation ? `Hóspede: ${reservation.guest_name}` : ''}
-                >
-                  {reservation ? reservation.guest_name : ''}
-                </div>
-              );
-            })}
-          </div>
-        ))}
+                  return (
+                    <td
+                      key={`${room.id}-${day.format("YYYY-MM-DD")}`}
+                      className={reservation ? "reserved" : "available"}
+                      onClick={() => handleCellClick(room.id, day.format("YYYY-MM-DD"))}
+                      style={{ cursor: "pointer" }}
+                    >
+                      {reservation ? reservation.guest_name : ""}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+
+      {showAddModal && (
+        <AddReservationModal
+          selectedRoom={selectedRoom}
+          selectedDate={selectedDate}
+          onClose={() => setShowAddModal(false)}
+          onSubmit={handleAddReservation}
+          guests={guests}
+        />
+      )}
     </div>
   );
 };
 
-export default ReservationsTimeline;
+export default ReservationsPage;

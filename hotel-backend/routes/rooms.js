@@ -6,7 +6,6 @@ const db = require('../db/connection');
 router.get('/', async (req, res) => {
     try {
       const [rows] = await db.query('SELECT * FROM rooms');
-      console.log('Resultado do MySQL:', rows); // Log para depuração
       res.json(rows);
     } catch (error) {
       console.error('Erro ao buscar quartos:', error);
@@ -57,7 +56,6 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 
 module.exports = router;
 
