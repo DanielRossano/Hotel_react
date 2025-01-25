@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/ReservationsPage.css";
 
 const AddReservationModal = ({
@@ -8,26 +8,51 @@ const AddReservationModal = ({
   onSubmit,
   guests = [],
 }) => {
+  const [searchTerm, setSearchTerm] = useState(""); // Termo de busca
+  const [filteredGuests, setFilteredGuests] = useState([]); // Hóspedes filtrados
+  const [showSuggestions, setShowSuggestions] = useState(false); // Controla a exibição das sugestões
   const [newReservation, setNewReservation] = useState({
     room_id: selectedRoom?.id || "",
     guest_id: "",
-    start_date: selectedDate || "",
-    end_date: "",
-    daily_rate: "",
+    start_date: selectedDate ? `${selectedDate}T13:00` : "", // Check-in padrão às 13h
+    end_date: selectedDate ? `${selectedDate}T12:00` : "", // Check-out padrão às 12h
+    daily_rate: selectedRoom?.preco || "", // Valor padrão do quarto
     total_amount: "",
   });
-  
+
+  // Normaliza strings, removendo caracteres especiais e acentos
+  const normalizeString = (str) =>
+    str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9 ]/g, "");
+
+  // Atualiza a lista de hóspedes conforme o termo de busca
+  useEffect(() => {
+    if (searchTerm) {
+      const normalizedSearch = normalizeString(searchTerm);
+      const filtered = guests.filter((guest) =>
+        normalizeString(guest.name).includes(normalizedSearch)
+      );
+      setFilteredGuests(filtered);
+      setShowSuggestions(true);
+    } else {
+      setFilteredGuests([]);
+      setShowSuggestions(false);
+    }
+  }, [searchTerm, guests]);
 
   useEffect(() => {
-    // Atualiza o estado inicial do modal
     setNewReservation((prev) => ({
       ...prev,
       room_id: selectedRoom?.id || "",
-      start_date: selectedDate || "",
+      start_date: selectedDate ? `${selectedDate}T13:00` : "",
+      end_date: selectedDate ? `${selectedDate}T12:00` : "",
+      daily_rate: selectedRoom?.preco || "",
     }));
   }, [selectedRoom, selectedDate]);
 
-  // Calcula o valor total da reserva
   useEffect(() => {
     const { daily_rate, start_date, end_date } = newReservation;
     if (daily_rate && start_date && end_date) {
@@ -44,14 +69,40 @@ const AddReservationModal = ({
     setNewReservation((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(newReservation);
+  const handleSelectGuest = (guest) => {
+    setNewReservation((prev) => ({ ...prev, guest_id: guest.id }));
+    setSearchTerm(guest.name);
+    setShowSuggestions(false);
   };
 
-
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!newReservation.start_date || !newReservation.end_date) {
+      alert("Por favor, preencha a data e hora de início e fim.");
+      return;
+    }
+    onSubmit(newReservation); // Submete a nova reserva
+  };
+  
+  // Hook que ajusta o horário de fim, caso seja anterior ao horário de início
+  useEffect(() => {
+    const { start_date, end_date } = newReservation;
+  
+    if (start_date && end_date) {
+      const start = new Date(start_date);
+      const end = new Date(end_date);
+  
+      if (end <= start) {
+        setNewReservation((prev) => ({
+          ...prev,
+          end_date: `${start_date.split("T")[0]}T12:00`, // Define um horário padrão
+        }));
+      }
+    }
+  }, [newReservation.start_date, newReservation.end_date]);
+  
   if (!selectedRoom || !selectedDate) return null;
-
+  
   return (
     <div
       className="modal fade show"
@@ -70,31 +121,48 @@ const AddReservationModal = ({
           </div>
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
-              {/* Campo Hóspede */}
-              <div className="mb-3">
-                <label htmlFor="guest_id" className="form-label">
-                  Hóspede
+              {/* Campo de Busca com Sugestões */}
+              <div className="mb-3 position-relative">
+                <label htmlFor="searchGuest" className="form-label d-flex align-items-center">
+                  Buscar Hóspede
+                  <a
+                    href="/guests"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ms-2 text-primary"
+                    style={{ fontSize: "0.9rem" }}
+                  >
+                    Cadastrar
+                  </a>
                 </label>
-                <select
-                  id="guest_id"
-                  name="guest_id"
-                  className="form-select"
-                  value={newReservation.guest_id}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="" disabled>
-                    Selecione um hóspede
-                  </option>
-                  {guests.map((guest) => (
-                    <option key={guest.id} value={guest.id}>
-                      {guest.name}
-                    </option>
-                  ))}
-                </select>
+                <input
+                  type="text"
+                  id="searchGuest"
+                  className="form-control"
+                  placeholder="Digite o nome do hóspede"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                />
+                {showSuggestions && filteredGuests.length > 0 && (
+                  <ul className="list-group position-absolute w-100">
+                    {filteredGuests.map((guest) => (
+                      <li
+                        key={guest.id}
+                        className="list-group-item list-group-item-action"
+                        onClick={() => handleSelectGuest(guest)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        {guest.name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
-                {/* Campo Quarto */}
-                <div className="mb-3">
+
+              {/* Campo Quarto */}
+              <div className="mb-3">
                 <label htmlFor="room_id" className="form-label">
                   Quarto
                 </label>
@@ -106,36 +174,74 @@ const AddReservationModal = ({
                   value={newReservation.room_id}
                   readOnly
                 />
-                </div>
+              </div>
 
               {/* Data de Início */}
               <div className="mb-3">
-                <label htmlFor="start_date" className="form-label">
-                  Data de Início
+                <label htmlFor="startDate" className="form-label">
+                  Data de Início: (Check-in)
                 </label>
                 <input
                   type="date"
-                  id="start_date"
-                  name="start_date"
+                  id="startDate"
+                  name="startDate"
                   className="form-control"
-                  value={newReservation.start_date}
-                  onChange={handleInputChange}
+                  value={newReservation.start_date.split("T")[0] || ""}
+                  onChange={(e) =>
+                    setNewReservation({
+                      ...newReservation,
+                      start_date: `${e.target.value}T${newReservation.start_date.split("T")[1] || "13:00"}`,
+                    })
+                  }
+                  required
+                />
+                <input
+                  type="time"
+                  id="startTime"
+                  name="startTime"
+                  className="form-control mt-2"
+                  value={newReservation.start_date.split("T")[1] || "13:00"}
+                  onChange={(e) =>
+                    setNewReservation({
+                      ...newReservation,
+                      start_date: `${newReservation.start_date.split("T")[0]}T${e.target.value}`,
+                    })
+                  }
                   required
                 />
               </div>
 
               {/* Data de Fim */}
               <div className="mb-3">
-                <label htmlFor="end_date" className="form-label">
-                  Data de Fim
+                <label htmlFor="endDate" className="form-label">
+                  Data de Fim: (Check-out)
                 </label>
                 <input
                   type="date"
-                  id="end_date"
-                  name="end_date"
+                  id="endDate"
+                  name="endDate"
                   className="form-control"
-                  value={newReservation.end_date}
-                  onChange={handleInputChange}
+                  value={newReservation.end_date.split("T")[0] || ""}
+                  onChange={(e) =>
+                    setNewReservation({
+                      ...newReservation,
+                      end_date: `${e.target.value}T${newReservation.end_date.split("T")[1] || "12:00"}`,
+                    })
+                  }
+                  required
+                />
+                <input
+                  type="time"
+                  id="endTime"
+                  name="endTime"
+                  className="form-control mt-2"
+                  value={newReservation.end_date.split("T")[1] || "12:00"}
+                  onChange={(e) =>
+                    setNewReservation({
+                      ...newReservation,
+                      end_date: `${newReservation.end_date.split("T")[0]}T${e.target.value}`,
+                    })
+                  }
                   required
                 />
               </div>
@@ -144,6 +250,9 @@ const AddReservationModal = ({
               <div className="mb-3">
                 <label htmlFor="daily_rate" className="form-label">
                   Valor da Diária (R$)
+                  <span className="ms-2 text-muted">
+                    (Padrão: R$ {selectedRoom?.preco?.toFixed(2) || "0.00"})
+                  </span>
                 </label>
                 <input
                   type="number"

@@ -1,0 +1,195 @@
+/* Variáveis para cores e fonte */
+:root {
+    --primary-color: #004080;
+    --secondary-color: #f8f9fa;
+    --background-color: #f9f9f9;
+    --text-color: #333;
+    --hover-bg-color: #c3f0c3;
+    --reserved-bg-color: #ffd580;
+    --reserved-hover-bg: #ffc107;
+    --available-bg-color: #e8faff;
+    --font-family: Arial, sans-serif;
+}
+
+/* Geral */
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+}
+
+/* Container principal */
+.daily-container {
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* Cabeçalho */
+.daily-title {
+    font-size: 24px;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Botões */
+button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+button.btn-primary {
+    background-color: var(--primary-color);
+}
+
+button.btn-primary:hover {
+    background-color: #003366;
+}
+
+/* Input de data */
+.daily-date-input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.daily-date-label {
+    margin-right: 10px;
+}
+
+/* Tabela */
+.daily-table {
+    border-collapse: collapse;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.daily-table th,
+.daily-table td {
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 5px; /* Reduzido para linhas mais finas */
+}
+
+.daily-table th {
+    background-color: var(--primary-color);
+    color: #fff;
+    font-weight: bold;
+}
+
+.daily-table td {
+    font-size: 14px;
+    line-height: 1.2; /* Torna as linhas mais compactas */
+}
+
+/* Limitar largura da coluna de quartos */
+.daily-table th:first-child,
+.daily-table td:first-child {
+    width: 120px; /* Limite para a coluna de quartos */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Células de status */
+.daily-available {
+    background-color: var(--available-bg-color);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.daily-available:hover {
+    background-color: var(--hover-bg-color);
+}
+
+.daily-reserved {
+    background-color: var(--reserved-bg-color);
+    color: #000;
+}
+
+.daily-reserved:hover {
+    background-color: var(--reserved-hover-bg);
+}
+
+/* Modal */
+.modal-dialog {
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.modal-header {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 15px;
+}
+
+.modal-title {
+    font-size: 18px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+}
+
+.modal-footer button {
+    margin-left: 10px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .daily-table th,
+    .daily-table td {
+        font-size: 12px;
+        padding: 5px;
+    }
+
+    button {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+
+/* Células específicas */
+.daily-cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.daily-cell div {
+    margin: 2px 0;
+}
+
+.daily-date-selector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}

@@ -4,7 +4,7 @@ const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: 'root',
-  database: 'hotel_control',
+  database: 'hotel',
 });
 
 // Exportando conexão com suporte a Promises

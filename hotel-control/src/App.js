@@ -11,6 +11,7 @@ import ReservationsPage from './pages/ReservationsPage';
 import './App.css';
 import RoomsPage from './pages/RoomsPage';
 import AddReservation from './pages/AddReservation';
+import DailyReservationsPage from './pages/DailyReservationsPage';
 
 const App = () => (
   <Router>
@@ -24,7 +25,7 @@ const App = () => (
             <Route path="/reservations" element={<ReservationsPage />} />
             <Route path="/Addreservations" element={<AddReservation/>} />
             <Route path="/rooms" element={<RoomsPage />} />
-            {/* Adicione outras rotas aqui */}
+            <Route path="/daily-reservations" element={<DailyReservationsPage />} />
           </Routes>
         </div>
       </div>

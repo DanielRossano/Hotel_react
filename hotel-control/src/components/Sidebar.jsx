@@ -17,10 +17,26 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         {/* Navegação */}
         <nav>
           <ul>
-            <li><a href="/Addreservations">Dashboard</a></li>
-            <li><a href="/rooms">Quartos</a></li>
-            <li><a href="/reservations">Reservas</a></li>
-            <li><a href="/guests">Hóspedes</a></li>
+            <li>
+              <a href="/daily-reservations">
+                <i className="fas fa-clock"></i> Controle Diário
+              </a>
+            </li>
+            <li>
+              <a href="/rooms">
+                <i className="fas fa-bed"></i> Quartos
+              </a>
+            </li>
+            <li>
+              <a href="/reservations">
+                <i className="fas fa-calendar-check"></i> Reservas
+              </a>
+            </li>
+            <li>
+              <a href="/guests">
+                <i className="fas fa-users"></i> Hóspedes
+              </a>
+            </li>
           </ul>
         </nav>
       </div>

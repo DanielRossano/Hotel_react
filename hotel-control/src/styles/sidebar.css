@@ -73,3 +73,30 @@
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1049;
 }
+
+
+/* Ícones nos links */
+.sidebar nav a {
+  color: #2d3e50;
+  text-decoration: none;
+  padding: 10px 20px;
+  display: flex; /* Flexbox para alinhar ícone e texto */
+  align-items: center;
+  font-size: 16px;
+  gap: 10px; /* Espaço entre o ícone e o texto */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar nav a i {
+  font-size: 18px; /* Tamanho dos ícones */
+  color: #004080; /* Cor do ícone */
+}
+
+.sidebar nav a:hover {
+  background-color: lightgray; /* Destaque ao passar o mouse */
+  color: #004080; /* Cor do texto ao passar o mouse */
+}
+
+.sidebar nav a:hover i {
+  color: #0066cc; /* Cor do ícone ao passar o mouse */
+}
