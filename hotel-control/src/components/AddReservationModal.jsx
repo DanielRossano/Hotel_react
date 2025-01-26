@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import api from "../services/api";
 import "../styles/ReservationsPage.css";
 
 const AddReservationModal = ({
@@ -6,49 +7,57 @@ const AddReservationModal = ({
   selectedDate,
   onClose,
   onSubmit,
-  guests = [],
 }) => {
   const [searchTerm, setSearchTerm] = useState(""); // Termo de busca
-  const [filteredGuests, setFilteredGuests] = useState([]); // Hóspedes filtrados
+  const [filteredGuests, setFilteredGuests] = useState([]); // Hóspedes filtrados vindos do backend
   const [showSuggestions, setShowSuggestions] = useState(false); // Controla a exibição das sugestões
   const [newReservation, setNewReservation] = useState({
     room_id: selectedRoom?.id || "",
     guest_id: "",
     start_date: selectedDate ? `${selectedDate}T13:00` : "", // Check-in padrão às 13h
-    end_date: selectedDate ? `${selectedDate}T12:00` : "", // Check-out padrão às 12h
+    end_date: selectedDate
+      ? `${new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 1))
+          .toISOString()
+          .split("T")[0]}T12:00`
+      : "", // Check-out padrão para o dia seguinte às 12h
     daily_rate: selectedRoom?.preco || "", // Valor padrão do quarto
     total_amount: "",
   });
 
-  // Normaliza strings, removendo caracteres especiais e acentos
-  const normalizeString = (str) =>
-    str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/[^a-z0-9 ]/g, "");
-
-  // Atualiza a lista de hóspedes conforme o termo de busca
+  // Atualiza a lista de hóspedes com busca no backend
   useEffect(() => {
-    if (searchTerm) {
-      const normalizedSearch = normalizeString(searchTerm);
-      const filtered = guests.filter((guest) =>
-        normalizeString(guest.name).includes(normalizedSearch)
-      );
-      setFilteredGuests(filtered);
-      setShowSuggestions(true);
-    } else {
-      setFilteredGuests([]);
-      setShowSuggestions(false);
-    }
-  }, [searchTerm, guests]);
+    const fetchGuests = async () => {
+      if (searchTerm.trim()) {
+        try {
+          const response = await api.get(`/guests?search=${searchTerm}`);
+          setFilteredGuests(response.data);
+          setShowSuggestions(true);
+        } catch (error) {
+          console.error("Erro ao buscar hóspedes:", error);
+        }
+      } else {
+        setFilteredGuests([]);
+        setShowSuggestions(false);
+      }
+    };
+
+    const delayDebounce = setTimeout(() => {
+      fetchGuests();
+    }, 300); // Aguarda 300ms antes de buscar
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm]);
 
   useEffect(() => {
     setNewReservation((prev) => ({
       ...prev,
       room_id: selectedRoom?.id || "",
       start_date: selectedDate ? `${selectedDate}T13:00` : "",
-      end_date: selectedDate ? `${selectedDate}T12:00` : "",
+      end_date: selectedDate
+        ? `${new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 1))
+            .toISOString()
+            .split("T")[0]}T12:00`
+        : "",
       daily_rate: selectedRoom?.preco || "",
     }));
   }, [selectedRoom, selectedDate]);
@@ -83,26 +92,9 @@ const AddReservationModal = ({
     }
     onSubmit(newReservation); // Submete a nova reserva
   };
-  
-  // Hook que ajusta o horário de fim, caso seja anterior ao horário de início
-  useEffect(() => {
-    const { start_date, end_date } = newReservation;
-  
-    if (start_date && end_date) {
-      const start = new Date(start_date);
-      const end = new Date(end_date);
-  
-      if (end <= start) {
-        setNewReservation((prev) => ({
-          ...prev,
-          end_date: `${start_date.split("T")[0]}T12:00`, // Define um horário padrão
-        }));
-      }
-    }
-  }, [newReservation.start_date, newReservation.end_date]);
-  
+
   if (!selectedRoom || !selectedDate) return null;
-  
+
   return (
     <div
       className="modal fade show"
@@ -143,7 +135,6 @@ const AddReservationModal = ({
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onFocus={() => setShowSuggestions(true)}
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                 />
                 {showSuggestions && filteredGuests.length > 0 && (
                   <ul className="list-group position-absolute w-100">
@@ -195,20 +186,6 @@ const AddReservationModal = ({
                   }
                   required
                 />
-                <input
-                  type="time"
-                  id="startTime"
-                  name="startTime"
-                  className="form-control mt-2"
-                  value={newReservation.start_date.split("T")[1] || "13:00"}
-                  onChange={(e) =>
-                    setNewReservation({
-                      ...newReservation,
-                      start_date: `${newReservation.start_date.split("T")[0]}T${e.target.value}`,
-                    })
-                  }
-                  required
-                />
               </div>
 
               {/* Data de Fim */}
@@ -226,20 +203,6 @@ const AddReservationModal = ({
                     setNewReservation({
                       ...newReservation,
                       end_date: `${e.target.value}T${newReservation.end_date.split("T")[1] || "12:00"}`,
-                    })
-                  }
-                  required
-                />
-                <input
-                  type="time"
-                  id="endTime"
-                  name="endTime"
-                  className="form-control mt-2"
-                  value={newReservation.end_date.split("T")[1] || "12:00"}
-                  onChange={(e) =>
-                    setNewReservation({
-                      ...newReservation,
-                      end_date: `${newReservation.end_date.split("T")[0]}T${e.target.value}`,
                     })
                   }
                   required

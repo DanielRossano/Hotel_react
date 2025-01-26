@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
 import moment from "moment";
-import "../styles/DailyReservationsPage.css"; // Certifique-se de criar ou importar este arquivo de estilo
+import "../styles/DailyReservationsPage.css";
 import { loadRoomsAndReservations, createReservation } from "../services/reservationsFunctions";
 import AddReservationModal from "../components/AddReservationModal";
 import EditReservationModal from "../components/EditReservationModal";
@@ -27,17 +27,21 @@ const DailyReservationsControl = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [editReservation, setEditReservation] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [filterStartDate, setFilterStartDate] = useState(moment().startOf("week")); // Filtro temporário
-  const [filterEndDate, setFilterEndDate] = useState(moment().endOf("week")); // Filtro temporário
+  const [filterStartDate, setFilterStartDate] = useState(moment().startOf("week"));
+  const [filterEndDate, setFilterEndDate] = useState(moment().endOf("week"));
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const { rooms, reservations } = await loadRoomsAndReservations();
+        const fetchedGuests = await api.get("/guests");
         setRooms(rooms);
         setReservations(reservations);
+        setFilteredReservations(reservations);
+        setGuests(fetchedGuests.data);
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
+        toast.error("Erro ao carregar quartos, reservas ou hóspedes.");
       }
     };
 
@@ -45,63 +49,77 @@ const DailyReservationsControl = () => {
   }, []);
 
   useEffect(() => {
-    const filtered = reservations.filter((reservation) =>
-      moment(selectedDate).isBetween(
-        moment(reservation.start_date, "YYYY-MM-DDTHH:mm:ss"),
-        moment(reservation.end_date, "YYYY-MM-DDTHH:mm:ss"),
-        null,
-        "[]"
-      )
-    );
-    setFilteredReservations(filtered);
-  }, [selectedDate, reservations]);
+    const filtered = reservations.filter((reservation) => {
+      const reservationStart = moment(reservation.start_date, "YYYY-MM-DDTHH:mm:ss");
+      const reservationEnd = moment(reservation.end_date, "YYYY-MM-DDTHH:mm:ss");
+      const filterDateWithTime = moment(selectedDate).set({
+        hour: 17,
+        minute: 0,
+        second: 0,
+      });
 
-  const handleCellClick = (room, reservation) => {
+      return filterDateWithTime.isBetween(reservationStart, reservationEnd, null, "[]");
+    });
+
+    setFilteredReservations(filtered);
+  }, [reservations, selectedDate]);
+
+  const handleCellClick = (roomId, date, reservation) => {
     if (reservation) {
-      setEditReservation(reservation); // Abre modal de edição
+      const guest = guests.find((g) => g.id === reservation.guest_id);
+      setEditReservation({
+        ...reservation,
+        guest_name: guest ? guest.name : "Hóspede não encontrado",
+      });
     } else {
-      setSelectedRoom(room); // Define o quarto para adicionar reserva
+      setSelectedRoom(rooms.find((room) => room.id === roomId));
+      setSelectedDate(date);
       setShowAddModal(true);
     }
   };
 
-  const renderCellContent = (room) => {
-    const roomReservation = filteredReservations.find(
-      (res) => res.room_id === room.id
+  const renderCellContent = (room, day) => {
+    const reservationsForDay = filteredReservations.filter(
+      (res) =>
+        res.room_id === room.id &&
+        moment(day).isBetween(res.start_date, res.end_date, "day", "[]")
     );
 
-    const status = roomReservation ? "Ocupado" : "Disponível";
-    const guestName = roomReservation?.guest_name || "-";
-    const checkIn = roomReservation
-      ? moment(roomReservation.start_date).format("DD/MM HH:mm")
-      : "-";
-    const checkOut = roomReservation
-      ? moment(roomReservation.end_date).format("DD/MM HH:mm")
-      : "-";
+    if (reservationsForDay.length > 0) {
+      return reservationsForDay.map((reservation) => (
+        <div
+          key={reservation.id}
+          className="daily-cell daily-reserved"
+          onClick={() => handleCellClick(room.id, day, reservation)}
+          title={`Check-in: ${moment(reservation.start_date).format("DD/MM/YYYY HH:mm")}, Check-out: ${moment(reservation.end_date).format("DD/MM/YYYY HH:mm")}`}
+        >
+          <div>Hóspede: {reservation.guest_name}</div>
+          <div>Check-in: {moment(reservation.start_date).format("DD/MM/YYYY HH:mm")}</div>
+          <div>Check-out: {moment(reservation.end_date).format("DD/MM/YYYY HH:mm")}</div>
+        </div>
+      ));
+    }
 
     return (
       <div
-        className={`daily-cell ${status === "Ocupado" ? "daily-reserved" : "daily-available"}`}
-        onClick={() => handleCellClick(room, roomReservation)}
-        title={`Status: ${status}`}
+        className="daily-cell daily-available"
+        onClick={() => handleCellClick(room.id, day, null)}
+        title="Dia disponível"
       >
-        <div>{guestName} | Check-in: {checkIn} | Check-out: {checkOut}</div>
+        Livre
       </div>
     );
   };
 
- const handleAddReservation = async (reservation) => {
+
+  const handleAddReservation = async (reservation) => {
     try {
       const newReservation = await createReservation(reservation);
-  
-      // Busca o nome do hóspede correspondente
       const guest = guests.find((g) => g.id === newReservation.guest_id);
       const updatedReservation = { ...newReservation, guest_name: guest?.name || "Hóspede não encontrado" };
-  
-      // Atualiza as reservas no estado global
+
       setReservations((prev) => [...prev, updatedReservation]);
-  
-      // Verifica se a nova reserva está dentro do intervalo de filtros aplicados
+
       const reservationStart = moment(updatedReservation.start_date, "YYYY-MM-DDTHH:mm:ss");
       const reservationEnd = moment(updatedReservation.end_date, "YYYY-MM-DDTHH:mm:ss");
       if (
@@ -111,7 +129,7 @@ const DailyReservationsControl = () => {
       ) {
         setFilteredReservations((prev) => [...prev, updatedReservation]);
       }
-  
+
       setShowAddModal(false);
       toast.success("Reserva cadastrada com sucesso!");
     } catch (error) {
@@ -119,21 +137,14 @@ const DailyReservationsControl = () => {
       toast.error("Erro ao cadastrar reserva. Tente novamente.");
     }
   };
-  
 
-const handleDeleteReservation = async (reservationId) => {
+  const handleDeleteReservation = async (reservationId) => {
     try {
-      await deleteReservation(reservationId); // Função que chama o backend
-  
-      // Atualiza o estado removendo a reserva excluída
+      await deleteReservation(reservationId);
       const updatedReservations = reservations.filter((res) => res.id !== reservationId);
       setReservations(updatedReservations);
       setFilteredReservations(updatedReservations);
-  
-      // Fecha o modal de edição
       setEditReservation(null);
-  
-      // Exibe uma mensagem de sucesso
       toast.success("Reserva excluída com sucesso!");
     } catch (error) {
       console.error("Erro ao excluir reserva:", error);
@@ -141,7 +152,7 @@ const handleDeleteReservation = async (reservationId) => {
       toast.error(errorMessage);
     }
   };
- 
+
   const deleteReservation = async (id) => {
     try {
       const response = await api.delete(`/reservations/${id}`);
@@ -156,10 +167,8 @@ const handleDeleteReservation = async (reservationId) => {
     }
   };
 
-
   const handleUpdateReservation = async (updatedReservation) => {
     try {
-      // Lógica para atualizar a reserva no backend
       const updatedReservations = reservations.map((res) =>
         res.id === updatedReservation.id ? updatedReservation : res
       );
@@ -170,31 +179,36 @@ const handleDeleteReservation = async (reservationId) => {
       console.error("Erro ao atualizar reserva:", error);
       toast.error("Erro ao atualizar reserva.");
     }
-  };  
-
+  };
   const handleExportToWord = async () => {
     const rows = rooms.map((room) => {
       const roomReservation = filteredReservations.find(
         (res) => res.room_id === room.id
       );
 
+      const dailyRate = roomReservation?.daily_rate || "-";
+      const totalAmount = roomReservation
+        ? ((moment(roomReservation.end_date).diff(moment(roomReservation.start_date), "days") || 1) * dailyRate).toFixed(2)
+        : "-";
+
       return [
-        room.name,
+        `${room.name} (${dailyRate !== "-" ? `R$ ${dailyRate}` : "Sem diária"})`,
         roomReservation?.guest_name || "",
         roomReservation ? moment(roomReservation.start_date).format("DD/MM HH:mm") : "",
         roomReservation ? moment(roomReservation.end_date).format("DD/MM HH:mm") : "",
         "", // Placeholder para consumo
-        "", // Placeholder para total
+        totalAmount !== "-" ? `R$ ${totalAmount}` : "-",
       ];
     });
+
     const table = new Table({
       rows: [
         new TableRow({
           children: [
             { text: "Quarto", width: 800 },
             { text: "Hóspede", width: 3332 },
-            { text: "Entrada", width: 1200 },
-            { text: "Saída", width: 1200 },
+            { text: "Entrada", width: 800 },
+            { text: "Saída", width: 800 },
             { text: "Consumo", width: 2000 },
             { text: "Total", width: 800 },
           ].map((header) =>
@@ -204,6 +218,7 @@ const handleDeleteReservation = async (reservationId) => {
                   text: header.text,
                   bold: true,
                   alignment: AlignmentType.CENTER,
+                  font: { size: 22 }, // Font size 11
                 }),
               ],
               width: { size: header.width, type: WidthType.DXA },
@@ -220,6 +235,7 @@ const handleDeleteReservation = async (reservationId) => {
                       new Paragraph({
                         text: cell,
                         alignment: AlignmentType.CENTER,
+                        font: { size: 22 }, // Font size 11
                       }),
                     ],
                     width: { size: 1666, type: WidthType.DXA },
@@ -237,7 +253,7 @@ const handleDeleteReservation = async (reservationId) => {
           properties: {
             page: {
               margin: {
-                top: 720, // Margem mínima
+                top: 720,
                 right: 720,
                 bottom: 720,
                 left: 720,
@@ -265,8 +281,6 @@ const handleDeleteReservation = async (reservationId) => {
 
   return (
     <div className="daily-container">
-
-      {/* Seletor de Data */}
       <div className="daily-date-selector">
         <label htmlFor="selectedDate" className="daily-date-label">
           Data:
@@ -283,7 +297,6 @@ const handleDeleteReservation = async (reservationId) => {
         </button>
       </div>
 
-      {/* Tabela de Quartos */}
       <div className="daily-table-container">
         <table className="daily-table">
           <thead>
@@ -296,15 +309,19 @@ const handleDeleteReservation = async (reservationId) => {
             {rooms.map((room) => (
               <tr key={room.id}>
                 <td>{room.name}</td>
-                <td>{renderCellContent(room)}</td>
+                <td>
+                  {renderCellContent(
+                    room,
+                    moment(selectedDate, "YYYY-MM-DD")
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Modal para adicionar reserva */}
-     {showAddModal && (
+      {showAddModal && (
         <AddReservationModal
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
@@ -315,13 +332,13 @@ const handleDeleteReservation = async (reservationId) => {
         />
       )}
       <EditReservationModal
-  editReservation={editReservation}
-  setEditReservation={setEditReservation}
-  handleUpdateReservation={handleUpdateReservation}
-  handleDeleteReservation={handleDeleteReservation}
-  guests={guests}
-  rooms={rooms}
-/>
+        editReservation={editReservation}
+        setEditReservation={setEditReservation}
+        handleUpdateReservation={handleUpdateReservation}
+        handleDeleteReservation={handleDeleteReservation}
+        guests={guests}
+        rooms={rooms}
+      />
     </div>
   );
 };

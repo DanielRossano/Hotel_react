@@ -104,19 +104,6 @@ const ReservationsPage = () => {
     toast.success("Filtro aplicado com sucesso!");
   };
 
-  const handleWeekChange = (direction) => {
-    setFilterStartDate((prev) =>
-      direction === "prev"
-        ? prev.clone().subtract(1, "week").startOf("week")
-        : prev.clone().add(1, "week").startOf("week")
-    );
-    setFilterEndDate((prev) =>
-      direction === "prev"
-        ? prev.clone().subtract(1, "week").endOf("week")
-        : prev.clone().add(1, "week").endOf("week")
-    );
-  };
-
   const handleCellClick = (roomId, date, reservation) => {
     if (reservation) {
       // Abre o modal de edição para a reserva selecionada
@@ -272,15 +259,19 @@ const ReservationsPage = () => {
 
   return (
     <div className="container reservations-page">
+
       {/* Navegação de semana e filtro */}
+
+      <div className='d-flex justify-content-center mb-4'><h3>Listagem de Reserva:</h3></div>
+
       <div className="d-flex justify-content-center mb-4">
-        <label className="mx-2">Início:</label>
+        <label className="mx-2">De:</label>
         <input
           type="date"
           value={filterStartDate.format("YYYY-MM-DD")}
           onChange={(e) => setFilterStartDate(moment(e.target.value))}
         />
-        <label className="mx-2">Fim:</label>
+        <label className="mx-2">Até:</label>
         <input
           type="date"
           value={filterEndDate.format("YYYY-MM-DD")}
@@ -289,8 +280,7 @@ const ReservationsPage = () => {
         <button className="btn btn-primary mx-3" onClick={applyFilter}>
           Aplicar
         </button>
-      </div>
-      <div className="d-flex justify-content-center mb-4">
+
   {[...new Set(rooms.map((room) => room.location))].map((page) => (
     <button
       key={page}
@@ -302,7 +292,9 @@ const ReservationsPage = () => {
       Página {page}
     </button>
   ))}
-</div>
+
+      </div>
+     
 
       {/* Tabela de reservas */}
       <div className="table-responsive">

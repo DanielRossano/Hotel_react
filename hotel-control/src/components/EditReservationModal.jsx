@@ -9,7 +9,6 @@ const EditReservationModal = ({
   setEditReservation,
   handleUpdateReservation,
   handleDeleteReservation,
-  guests = [],
   rooms = [],
 }) => {
   useEffect(() => {
@@ -19,8 +18,8 @@ const EditReservationModal = ({
 
     if (modalElement) {
       const bootstrapModal = new bootstrap.Modal(modalElement, {
-        backdrop: "static", // Impede o fechamento ao clicar fora
-        keyboard: false, // Impede o fechamento ao pressionar "Esc"
+        backdrop: "static",
+        keyboard: false,
       });
       bootstrapModal.show();
     }
@@ -29,14 +28,14 @@ const EditReservationModal = ({
   const handleClose = () => {
     const modalElement = document.getElementById("editReservationModal");
     if (modalElement) {
-      const bootstrapModal = bootstrap.Modal.getInstance(modalElement); // Obtém a instância ativa do modal
+      const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
       if (bootstrapModal) {
-        bootstrapModal.hide(); // Fecha o modal corretamente
+        bootstrapModal.hide();
       }
     }
-    setEditReservation(null); // Reseta o estado de edição
+    setEditReservation(null);
     if (onClose) {
-      onClose(); // Chama o handler passado como prop
+      onClose();
     }
   };
 
@@ -48,7 +47,7 @@ const EditReservationModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     handleUpdateReservation(editReservation);
-    handleClose(); // Fecha o modal após salvar
+    handleClose();
   };
 
   if (!editReservation) return null;
@@ -67,33 +66,17 @@ const EditReservationModal = ({
             <button
               type="button"
               className="btn-close"
-              onClick={handleClose} // Fecha o modal ao clicar no botão de fechar
+              onClick={handleClose}
             ></button>
           </div>
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
-              {/* Campo de Hóspede */}
+              {/* Exibição do Hóspede */}
               <div className="mb-3">
-                <label htmlFor="guestSelect" className="form-label">
-                  Hóspede
-                </label>
-                <select
-                  id="guestSelect"
-                  name="guest_id"
-                  className="form-select"
-                  value={editReservation.guest_id || ""}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="" disabled>
-                    Selecione um hóspede
-                  </option>
-                  {guests.map((guest) => (
-                    <option key={guest.id} value={guest.id}>
-                      {guest.name}
-                    </option>
-                  ))}
-                </select>
+                <label className="form-label">Hóspede</label>
+                <div className="form-control-plaintext">
+                  {editReservation.guest_name || "Hóspede não encontrado"}
+                </div>
               </div>
 
               {/* Campo Quarto */}
@@ -134,25 +117,7 @@ const EditReservationModal = ({
                   onChange={(e) =>
                     setEditReservation({
                       ...editReservation,
-                      start_date: `${e.target.value}T${moment(editReservation.start_date).format(
-                        "HH:mm"
-                      ) || "13:00"}`,
-                    })
-                  }
-                  required
-                />
-                <input
-                  type="time"
-                  id="startTime"
-                  name="startTime"
-                  className="form-control mt-2"
-                  value={moment(editReservation.start_date).format("HH:mm") || "13:00"}
-                  onChange={(e) =>
-                    setEditReservation({
-                      ...editReservation,
-                      start_date: `${moment(editReservation.start_date).format(
-                        "YYYY-MM-DD"
-                      )}T${e.target.value}`,
+                      start_date: `${e.target.value}T17:00`,
                     })
                   }
                   required
@@ -173,25 +138,7 @@ const EditReservationModal = ({
                   onChange={(e) =>
                     setEditReservation({
                       ...editReservation,
-                      end_date: `${e.target.value}T${moment(editReservation.end_date).format(
-                        "HH:mm"
-                      ) || "12:00"}`,
-                    })
-                  }
-                  required
-                />
-                <input
-                  type="time"
-                  id="endTime"
-                  name="endTime"
-                  className="form-control mt-2"
-                  value={moment(editReservation.end_date).format("HH:mm") || "12:00"}
-                  onChange={(e) =>
-                    setEditReservation({
-                      ...editReservation,
-                      end_date: `${moment(editReservation.end_date).format(
-                        "YYYY-MM-DD"
-                      )}T${e.target.value}`,
+                      end_date: `${e.target.value}T17:00`,
                     })
                   }
                   required

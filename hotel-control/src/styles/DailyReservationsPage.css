@@ -38,31 +38,6 @@ body {
     text-align: center;
 }
 
-/* Botões */
-button {
-    background-color: var(--primary-color);
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-button:hover {
-    background-color: var(--secondary-color);
-    color: var(--primary-color);
-    border: 1px solid var(--primary-color);
-}
-
-button.btn-primary {
-    background-color: var(--primary-color);
-}
-
-button.btn-primary:hover {
-    background-color: #003366;
-}
 
 /* Input de data */
 .daily-date-input {
@@ -129,6 +104,7 @@ button.btn-primary:hover {
 
 .daily-reserved:hover {
     background-color: var(--reserved-hover-bg);
+    cursor: pointer;
 }
 
 /* Modal */
