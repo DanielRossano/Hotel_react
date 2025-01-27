@@ -8,25 +8,32 @@ import {
   loadRoomsAndReservations,
   createReservation,
   fetchGuests,
+  updateReservation,
+  deleteReservation,
 } from "../services/reservationsFunctions";
-import api from "../services/api";
 import "../styles/ReservationsPage.css";
 
 const ReservationsPage = () => {
-  const [rooms, setRooms] = useState([]);
-  const [reservations, setReservations] = useState([]);
-  const [filteredReservations, setFilteredReservations] = useState([]);
+  // **Estados Globais**
+  const [rooms, setRooms] = useState([]); // Lista de quartos
+  const [reservations, setReservations] = useState([]); // Todas as reservas
+  const [filteredReservations, setFilteredReservations] = useState([]); // Reservas filtradas
+  const [guests, setGuests] = useState([]); // Lista de hóspedes
+
+  // **Estados de Controle**
   const [startDate, setStartDate] = useState(moment().startOf("week"));
   const [endDate, setEndDate] = useState(moment().endOf("week"));
   const [filterStartDate, setFilterStartDate] = useState(moment().startOf("week"));
   const [filterEndDate, setFilterEndDate] = useState(moment().endOf("week"));
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // **Estados de Modais**
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [guests, setGuests] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [editReservation, setEditReservation] = useState(null);
 
+  // **Carregar Dados Iniciais**
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -41,50 +48,33 @@ const ReservationsPage = () => {
       }
     };
 
-    fetchData();
-  }, []);
 
-  useEffect(() => {
     const fetchGuestsData = async () => {
       try {
         const fetchedGuests = await fetchGuests();
         setGuests(fetchedGuests);
-        toast.success("Hóspedes carregados com sucesso!");
       } catch (error) {
         console.error("Erro ao carregar hóspedes:", error);
-        toast.error("Erro ao carregar lista de hóspedes.");
+        toast.error("Erro ao carregar hóspedes.");
       }
     };
 
+    fetchData();
     fetchGuestsData();
   }, []);
 
+  // **Gerar Intervalo de Datas**
   const generateDaysRange = () => {
     const days = [];
     let day = startDate.clone();
-
     while (day <= endDate) {
       days.push(day.clone());
       day.add(1, "day");
     }
-
     return days;
   };
 
-  const handleUpdateReservation = async (updatedReservation) => {
-    try {
-      const updatedReservations = reservations.map((res) =>
-        res.id === updatedReservation.id ? updatedReservation : res
-      );
-      setReservations(updatedReservations);
-      setFilteredReservations(updatedReservations);
-      toast.success("Reserva atualizada com sucesso!");
-    } catch (error) {
-      console.error("Erro ao atualizar reserva:", error);
-      toast.error("Erro ao atualizar reserva.");
-    }
-  };
-
+  // **Filtrar Reservas**
   const applyFilter = () => {
     const filtered = reservations.filter((reservation) => {
       const reservationStart = moment(reservation.start_date, "YYYY-MM-DDTHH:mm:ss");
@@ -102,92 +92,19 @@ const ReservationsPage = () => {
     setEndDate(filterEndDate.clone());
     toast.success("Filtro aplicado com sucesso!");
   };
-
-  const handleCellClick = (roomId, date, reservation) => {
-    if (reservation) {
-      setEditReservation(reservation);
-      toast.info("Reserva selecionada para edição.");
-    } else {
-      setSelectedRoom(rooms.find((room) => room.id === roomId));
-      setSelectedDate(date);
-      setShowAddModal(true);
-      toast.info("Preparando para adicionar nova reserva.");
-    }
-  };
-
-  const renderCellContent = (room, day) => {
-    const reservationsForDay = filteredReservations.filter(
-      (res) =>
-        res.room_id === room.id &&
-        moment(day).isBetween(res.start_date, res.end_date, "day", "[]")
-    );
-
-    const checkInReservations = reservationsForDay.filter((res) =>
-      moment(day).isSame(moment(res.start_date), "day")
-    );
-    const checkOutReservations = reservationsForDay.filter((res) =>
-      moment(day).isSame(moment(res.end_date), "day")
-    );
-
-    if (checkInReservations.length > 0 || checkOutReservations.length > 0) {
-      return (
-        <div className="split-cell">
-          {checkOutReservations.map((res) => (
-            <div
-              key={`checkOut-${res.id}`}
-              className="half reserved"
-              onClick={() => handleCellClick(room.id, day.format("YYYY-MM-DD"), res)}
-              title={`Check-out às ${moment(res.end_date).format("HH:mm")} - ${res.guest_name}`}
-            >
-              {res.guest_name}
-            </div>
-          ))}
-          {checkInReservations.map((res) => (
-            <div
-              key={`checkIn-${res.id}`}
-              className="half reserved"
-              onClick={() => handleCellClick(room.id, day.format("YYYY-MM-DD"), res)}
-              title={`Check-in às ${moment(res.start_date).format("HH:mm")} - ${res.guest_name}`}
-            >
-              {res.guest_name}
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    if (reservationsForDay.length > 0) {
-      const reservation = reservationsForDay[0];
-      return (
-        <div
-          className="reserved"
-          onClick={() => handleCellClick(room.id, day.format("YYYY-MM-DD"), reservation)}
-          title={`Reserva completa: Check-in às ${moment(reservation.start_date).format("HH:mm")}, Check-out às ${moment(reservation.end_date).format("HH:mm")}`}
-        >
-          {reservation.guest_name}
-        </div>
-      );
-    }
-
-    return (
-      <div
-        className="available"
-        onClick={() => handleCellClick(room.id, day.format("YYYY-MM-DD"), null)}
-        title="Dia disponível"
-      >
-        Livre
-      </div>
-    );
-  };
-
+  
   const handleAddReservation = async (reservation) => {
     try {
       const newReservation = await createReservation(reservation);
+  
+      // Busca o nome do hóspede correspondente
       const guest = guests.find((g) => g.id === newReservation.guest_id);
       const updatedReservation = { ...newReservation, guest_name: guest?.name || "Hóspede não encontrado" };
-
+  
+      // Atualiza as reservas no estado global
       setReservations((prev) => [...prev, updatedReservation]);
-
+  
+      // Verifica se a nova reserva está dentro do intervalo de filtros aplicados
       const reservationStart = moment(updatedReservation.start_date, "YYYY-MM-DDTHH:mm:ss");
       const reservationEnd = moment(updatedReservation.end_date, "YYYY-MM-DDTHH:mm:ss");
       if (
@@ -197,7 +114,7 @@ const ReservationsPage = () => {
       ) {
         setFilteredReservations((prev) => [...prev, updatedReservation]);
       }
-
+  
       setShowAddModal(false);
       toast.success("Reserva cadastrada com sucesso!");
     } catch (error) {
@@ -205,35 +122,77 @@ const ReservationsPage = () => {
       toast.error("Erro ao cadastrar reserva. Tente novamente.");
     }
   };
-
+  
+  const handleUpdateReservation = async (updatedReservation) => {
+    try {
+      const updatedData = await updateReservation(updatedReservation);
+      setReservations((prev) =>
+        prev.map((res) => (res.id === updatedData.id ? updatedData : res))
+      );
+      setFilteredReservations((prev) =>
+        prev.map((res) => (res.id === updatedData.id ? updatedData : res))
+      );
+      setEditReservation(null);
+      toast.success("Reserva atualizada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao atualizar reserva:", error);
+      toast.error("Erro ao atualizar reserva.");
+    }
+  };
+  
   const handleDeleteReservation = async (reservationId) => {
     try {
       await deleteReservation(reservationId);
-
-      const updatedReservations = reservations.filter((res) => res.id !== reservationId);
-      setReservations(updatedReservations);
-      setFilteredReservations(updatedReservations);
-
+      setReservations((prev) => prev.filter((res) => res.id !== reservationId));
+      setFilteredReservations((prev) =>
+        prev.filter((res) => res.id !== reservationId)
+      );
       setEditReservation(null);
       toast.success("Reserva excluída com sucesso!");
     } catch (error) {
       console.error("Erro ao excluir reserva:", error);
-      const errorMessage = error.response?.data?.error || "Erro ao excluir reserva. Tente novamente.";
-      toast.error(errorMessage);
+      toast.error("Erro ao excluir reserva. Tente novamente.");
     }
   };
+  
+  useEffect(() => {
+    applyFilter();
+  }, [reservations]);
 
-  const deleteReservation = async (id) => {
-    try {
-      const response = await api.delete(`/reservations/${id}`);
-      toast.success("Reserva cancelada com sucesso!");
-      return response.data;
-    } catch (error) {
-      console.error("Erro ao excluir reserva:", error);
-      const errorMessage = error.response?.data?.error || "Erro ao excluir reserva. Tente novamente.";
-      toast.error(errorMessage);
-      throw error;
+  // **Gerar Conteúdo das Células**
+  const renderCellContent = (room, day) => {
+    const reservationsForDay = filteredReservations.filter(
+      (res) =>
+        res.room_id === room.id &&
+        moment(day).isBetween(res.start_date, res.end_date, "day", "[]")
+    );
+
+    if (reservationsForDay.length > 0) {
+      const reservation = reservationsForDay[0];
+      return (
+        <div
+          className="reserved"
+          onClick={() => setEditReservation(reservation)}
+          title={`Reserva: ${reservation.guest_name || reservation.custom_name}`}
+        >
+          {reservation.custom_name || reservation.guest_name}
+        </div>
+      );
     }
+
+    return (
+      <div
+        className="available"
+        onClick={() => {
+          setSelectedRoom(room);
+          setSelectedDate(day.format("YYYY-MM-DD"));
+          setShowAddModal(true);
+        }}
+        title="Dia disponível"
+      >
+        Livre
+      </div>
+    );
   };
 
   const daysOfWeek = generateDaysRange();
@@ -241,8 +200,7 @@ const ReservationsPage = () => {
 
   return (
     <div className="container reservations-page">
-      <div className='d-flex justify-content-center mb-4'><h3>Listagem de Reserva:</h3></div>
-
+      <h3 className="text-center mb-4">Listagem de Reservas</h3>
       <div className="d-flex justify-content-center mb-4">
         <label className="mx-2">De:</label>
         <input
@@ -259,16 +217,6 @@ const ReservationsPage = () => {
         <button className="btn btn-primary mx-3" onClick={applyFilter}>
           Aplicar
         </button>
-
-        {[...new Set(rooms.map((room) => room.location))].map((page) => (
-          <button
-            key={page}
-            className={`btn ${currentPage === parseInt(page) ? "btn-primary" : "btn-outline-primary"} mx-2`}
-            onClick={() => setCurrentPage(parseInt(page))}
-          >
-            Página {page}
-          </button>
-        ))}
       </div>
 
       <div className="table-responsive">
@@ -294,24 +242,28 @@ const ReservationsPage = () => {
         </table>
       </div>
 
+      {/* Modais */}
       {showAddModal && (
         <AddReservationModal
-          isOpen={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          onSubmit={(reservation) => handleAddReservation(reservation)}
-          selectedRoom={selectedRoom}
-          selectedDate={selectedDate}
-          guests={guests}
-        />
-      )}
-      <EditReservationModal
-        editReservation={editReservation}
-        setEditReservation={setEditReservation}
-        handleUpdateReservation={handleUpdateReservation}
-        handleDeleteReservation={handleDeleteReservation}
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSubmit={(reservation) => handleAddReservation(reservation)}
+        selectedRoom={selectedRoom}
+        selectedDate={selectedDate}
         guests={guests}
-        rooms={rooms}
       />
+      )}
+      {editReservation && (
+       <EditReservationModal
+       editReservation={editReservation}
+  setEditReservation={setEditReservation}
+  onClose={() => setEditReservation(null)}
+  onSubmit={handleUpdateReservation}
+  handleDeleteReservation={handleDeleteReservation}
+       rooms={rooms}
+       guests={guests}
+     />
+      )}
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import AsyncSelect from "react-select/async";
 import "../styles/ReservationsPage.css";
-import { handleInputChange, handleSubmit, calculateTotalAndDays } from "../services/reservationsFunctions";
+import { handleInputChange, calculateTotalAndDays } from "../services/reservationsFunctions";
 
 const AddReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit }) => {
   const [useCustomName, setUseCustomName] = useState(false);
@@ -90,7 +90,10 @@ const AddReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit }) 
   onSubmit={(e) => {
     e.preventDefault();
     if (typeof onSubmit === "function") {
-      onSubmit(newReservation); // Garante que a função `onSubmit` seja chamada
+      onSubmit({
+        ...newReservation,
+        custom_name: useCustomName ? customName : null, // Inclui o customName no envio
+      });
     } else {
       console.error("Função onSubmit não definida ou inválida!");
     }
@@ -113,9 +116,7 @@ const AddReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit }) 
                   <AsyncSelect
                     defaultOptions
                     cacheOptions={false}
-                    value={
-                      filteredGuests.find((guest) => guest.value === newReservation.guest_id) || null
-                    }
+                    value={filteredGuests.find((guest) => guest.value === newReservation.guest_id) || null}
                     loadOptions={async (inputValue) => {
                       if (!inputValue) return [];
                       try {

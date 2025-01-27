@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/connection');
+const moment = require('moment');
 
 // Listar todas as reservas
 router.get('/', async (req, res) => {
@@ -9,7 +10,8 @@ router.get('/', async (req, res) => {
       SELECT 
         reservations.*, 
         rooms.name AS room_name, 
-        guests.name AS guest_name 
+        guests.name AS guest_name,
+        reservations.custom_name
       FROM reservations
       JOIN rooms ON reservations.room_id = rooms.id
       JOIN guests ON reservations.guest_id = guests.id
@@ -20,19 +22,21 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 // Cadastrar nova reserva
 router.post('/', async (req, res) => {
-  const { room_id, guest_id, start_date, end_date, daily_rate } = req.body;
+  const { room_id, guest_id, start_date, end_date, daily_rate, custom_name } = req.body;
 
   if (!room_id || !guest_id || !start_date || !end_date || !daily_rate) {
-    return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+    return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos.' });
   }
 
   try {
-    // Verificar conflito de datas para o quarto
-    const [conflictingReservations] = await db.query(
-      `
+    // Formatar as datas para o formato compatível com MySQL
+    const formattedStartDate = moment(start_date).format('YYYY-MM-DD HH:mm:ss');
+    const formattedEndDate = moment(end_date).format('YYYY-MM-DD HH:mm:ss');
+
+    // Verificar conflitos de datas para o quarto
+    const [conflictingReservations] = await db.query(`
       SELECT * FROM reservations 
       WHERE room_id = ? 
       AND (
@@ -40,45 +44,41 @@ router.post('/', async (req, res) => {
         (start_date <= ? AND end_date >= ?) OR 
         (start_date >= ? AND end_date <= ?)
       )
-      `,
-      [room_id, end_date, start_date, start_date, end_date, start_date, end_date]
-    );
+    `, [room_id, formattedEndDate, formattedStartDate, formattedStartDate, formattedEndDate, formattedStartDate, formattedEndDate]);
 
     if (conflictingReservations.length > 0) {
-      return res.status(400).json({
-        error: 'O quarto já está reservado para o período selecionado.',
-      });
+      return res.status(400).json({ error: 'O quarto já está reservado para o período selecionado.' });
     }
 
-    // Calcular total de diárias
-    const start = new Date(start_date);
-    const end = new Date(end_date);
-    const days = (end - start) / (1000 * 60 * 60 * 24);
+    // Verificar a validade das datas
+    const start = moment(start_date);
+    const end = moment(end_date);
 
-    if (days <= 0) {
-      return res.status(400).json({ error: 'Datas inválidas.' });
+    if (!end.isAfter(start)) {
+      return res.status(400).json({ error: 'Datas inválidas. O check-out deve ser após o check-in.' });
     }
+
+    // Calcular a quantidade de dias, considerando diferenças menores que 24 horas como 1 diária
+    const days = Math.ceil(end.diff(start, 'hours') / 24);
 
     const total_amount = days * daily_rate;
 
     // Inserir a reserva no banco de dados
-    const [result] = await db.query(
-      `
+    const [result] = await db.query(`
       INSERT INTO reservations 
-      (room_id, guest_id, start_date, end_date, daily_rate, total_amount, amount_paid) 
-      VALUES (?, ?, ?, ?, ?, ?, 0)
-      `,
-      [room_id, guest_id, start_date, end_date, daily_rate, total_amount]
-    );
+      (room_id, guest_id, start_date, end_date, daily_rate, total_amount, amount_paid, custom_name) 
+      VALUES (?, ?, ?, ?, ?, ?, 0, ?)
+    `, [room_id, guest_id, formattedStartDate, formattedEndDate, daily_rate, total_amount, custom_name]);
 
     res.status(201).json({
       id: result.insertId,
       room_id,
       guest_id,
-      start_date,
-      end_date,
+      start_date: formattedStartDate,
+      end_date: formattedEndDate,
       daily_rate,
       total_amount,
+      custom_name,
     });
   } catch (error) {
     console.error('Erro ao cadastrar reserva:', error);
@@ -86,18 +86,23 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Atualizar reserva
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { room_id, guest_id, start_date, end_date, daily_rate } = req.body;
+  const { room_id, guest_id, start_date, end_date, daily_rate, custom_name } = req.body;
 
   if (!room_id || !guest_id || !start_date || !end_date || !daily_rate) {
-    return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+    return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos.' });
   }
 
   try {
-    const start = new Date(start_date);
-    const end = new Date(end_date);
-    const days = (end - start) / (1000 * 60 * 60 * 24);
+    // Formatar as datas para o formato compatível com MySQL
+    const formattedStartDate = moment(start_date).format('YYYY-MM-DD HH:mm:ss');
+    const formattedEndDate = moment(end_date).format('YYYY-MM-DD HH:mm:ss');
+
+    const start = moment(formattedStartDate);
+    const end = moment(formattedEndDate);
+    const days = end.diff(start, 'days');
 
     if (days <= 0) {
       return res.status(400).json({ error: 'Datas inválidas.' });
@@ -105,14 +110,11 @@ router.put('/:id', async (req, res) => {
 
     const total_amount = days * daily_rate;
 
-    const [result] = await db.query(
-      `
+    const [result] = await db.query(`
       UPDATE reservations 
-      SET room_id = ?, guest_id = ?, start_date = ?, end_date = ?, daily_rate = ?, total_amount = ? 
+      SET room_id = ?, guest_id = ?, start_date = ?, end_date = ?, daily_rate = ?, total_amount = ?, custom_name = ? 
       WHERE id = ?
-      `,
-      [room_id, guest_id, start_date, end_date, daily_rate, total_amount, id]
-    );
+    `, [room_id, guest_id, formattedStartDate, formattedEndDate, daily_rate, total_amount, custom_name, id]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Reserva não encontrada.' });
@@ -124,8 +126,7 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-// exclui reserva
+// Excluir reserva
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 

@@ -102,14 +102,14 @@ export const fetchGuests = async () => {
 
 // Atualizar reserva
 export const updateReservation = async (updatedReservation) => {
-  const { id, ...data } = updatedReservation;
   try {
+    const { id, ...data } = updatedReservation;
     const response = await api.put(`/reservations/${id}`, data);
     toast.success('Reserva atualizada com sucesso!');
     return response.data;
   } catch (error) {
     console.error('Erro ao atualizar reserva:', error);
-    toast.error('Erro ao atualizar reserva. Tente novamente.');
+    toast.error('Erro ao atualizar reserva.');
     throw error;
   }
 };
@@ -117,13 +117,11 @@ export const updateReservation = async (updatedReservation) => {
 // Excluir reserva
 export const deleteReservation = async (id) => {
   try {
-    const response = await api.delete(`/reservations/${id}`);
-    toast.success('Reserva cancelada com sucesso!');
-    return response.data;
+    await api.delete(`/reservations/${id}`);
+    toast.success('Reserva excluída com sucesso!');
   } catch (error) {
     console.error('Erro ao excluir reserva:', error);
-    const errorMessage =
-      error.response?.data?.error || 'Erro ao excluir reserva. Tente novamente.';
+    const errorMessage = error.response?.data?.error || 'Erro ao excluir reserva.';
     toast.error(errorMessage);
     throw error;
   }
@@ -133,14 +131,17 @@ export const deleteReservation = async (id) => {
 export const handleDeleteReservation = async (reservationId, updateReservations) => {
   try {
     await deleteReservation(reservationId);
-    const updatedReservations = await fetchReservations(); // Atualiza a lista
-    updateReservations(updatedReservations); // Atualiza o estado no componente pai
-    toast.success('Reserva cancelada com sucesso!');
+    const updatedReservations = await fetchReservations(); // Busca a lista atualizada
+    if (typeof updateReservations === "function") {
+      updateReservations(updatedReservations); // Atualiza o estado no componente pai
+    }
+    toast.success("Reserva cancelada com sucesso!");
   } catch (error) {
-    console.error('Erro ao cancelar reserva:', error);
+    console.error("Erro ao cancelar reserva:", error);
     throw error;
   }
 };
+
 
 export const handleInputChange = (e, setNewReservation) => {
   const { name, value } = e.target;
@@ -197,3 +198,4 @@ export const calculateTotalAndDays = (reservation) => {
   toast.success('Total e dias calculados com sucesso!');
   return { total: "0.00", days: 0 };
 };
+
