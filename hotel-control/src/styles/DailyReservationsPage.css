@@ -169,3 +169,55 @@ body {
     margin-bottom: 20px;
     gap: 10px;
 }
+.daily-table-columns {
+    display: flex;
+    justify-content: space-between; /* Distribui as colunas uniformemente */
+    gap: 20px; /* Espaçamento entre as colunas */
+  }
+  
+  .daily-column {
+    flex: 1; /* Faz as colunas ocuparem espaços iguais */
+    max-width: calc(33.33% - 20px); /* Limita cada coluna a 1/3 do container menos o gap */
+    overflow-x: auto; /* Adiciona rolagem horizontal, se necessário */
+  }
+  
+  .daily-table {
+    width: 100%; /* Garante que a tabela ocupe o espaço disponível dentro da coluna */
+    border-collapse: collapse;
+  }
+  
+  .daily-table th,
+  .daily-table td {
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 5px;
+  }
+  
+  .daily-table th {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+  
+  .daily-cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .daily-reserved {
+    background-color: var(--reserved-bg-color);
+  }
+  
+  .daily-available {
+    background-color: var(--available-bg-color);
+    cursor: pointer;
+  }
+  
+  .daily-available:hover {
+    background-color: var(--hover-bg-color);
+  }
+  
