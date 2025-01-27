@@ -184,6 +184,78 @@ button.btn-outline-primary:hover {
   color: #fff;
 }
 
+/* Container do checkbox */
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Esconde o checkbox padrão */
+.check-input {
+  display: none;
+}
+
+/* Caixa customizada para o checkbox */
+.small-checkbox {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ccc;
+  border-radius: 3px;
+  background-color: #fff;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+/* Estado marcado */
+.check-input:checked + .small-checkbox {
+  background-color: #ccc;
+  border-color: #000000;
+}
+
+.check-input:checked + .small-checkbox::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Caixa desabilitada */
+.check-input:disabled + .small-checkbox {
+  background-color: #f4f4f4;
+  border-color: #ddd;
+  cursor: not-allowed;
+}
+
+/* Garanta que o estilo só será aplicado aos labels com essa classe */
+div.form-check > .form-check-label {
+  font-size: 14px;
+  color: #a8a8a8;
+  cursor: pointer;
+}
+
+/* Botão Limpar */
+button.btn-limpar {
+  background-color: #ccc;
+  color: #fff;
+  border: 2px solid #000000;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: all 0.3s ease-in-out;
+}
+
+button.btn-limpar:hover {
+  background-color: #acacac;
+  border-color: #000000;
+}
+
 /* Estilos Responsivos */
 @media (max-width: 768px) {
   .table th {

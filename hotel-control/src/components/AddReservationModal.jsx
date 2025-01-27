@@ -1,30 +1,30 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
+import AsyncSelect from "react-select/async";
 import "../styles/ReservationsPage.css";
+import { handleInputChange, handleSubmit, calculateTotalAndDays } from "../services/reservationsFunctions";
 
-const AddReservationModal = ({
-  selectedRoom,
-  selectedDate,
-  onClose,
-  onSubmit,
-}) => {
-  const [searchTerm, setSearchTerm] = useState(""); // Termo de busca
-  const [filteredGuests, setFilteredGuests] = useState([]); // Hóspedes filtrados vindos do backend
-  const [showSuggestions, setShowSuggestions] = useState(false); // Controla a exibição das sugestões
+const AddReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit }) => {
+  const [useCustomName, setUseCustomName] = useState(false);
+  const [customName, setCustomName] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredGuests, setFilteredGuests] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [newReservation, setNewReservation] = useState({
     room_id: selectedRoom?.id || "",
     guest_id: "",
-    start_date: selectedDate ? `${selectedDate}T13:00` : "", // Check-in padrão às 13h
+    start_date: selectedDate ? `${selectedDate}T13:00` : "",
     end_date: selectedDate
       ? `${new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 1))
           .toISOString()
           .split("T")[0]}T12:00`
-      : "", // Check-out padrão para o dia seguinte às 12h
-    daily_rate: selectedRoom?.preco || "", // Valor padrão do quarto
+      : "",
+    daily_rate: selectedRoom?.preco || "",
     total_amount: "",
+    checkin_time: "13:00",
+    checkout_time: "12:00",
   });
 
-  // Atualiza a lista de hóspedes com busca no backend
   useEffect(() => {
     const fetchGuests = async () => {
       if (searchTerm.trim()) {
@@ -43,7 +43,7 @@ const AddReservationModal = ({
 
     const delayDebounce = setTimeout(() => {
       fetchGuests();
-    }, 300); // Aguarda 300ms antes de buscar
+    }, 300);
 
     return () => clearTimeout(delayDebounce);
   }, [searchTerm]);
@@ -73,48 +73,30 @@ const AddReservationModal = ({
     }
   }, [newReservation.daily_rate, newReservation.start_date, newReservation.end_date]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewReservation((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSelectGuest = (guest) => {
-    setNewReservation((prev) => ({ ...prev, guest_id: guest.id }));
-    setSearchTerm(guest.name);
-    setShowSuggestions(false);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!newReservation.start_date || !newReservation.end_date) {
-      alert("Por favor, preencha a data e hora de início e fim.");
-      return;
-    }
-    onSubmit(newReservation); // Submete a nova reserva
-  };
+  const { total, days } = calculateTotalAndDays(newReservation);
 
   if (!selectedRoom || !selectedDate) return null;
 
   return (
-    <div
-      className="modal fade show"
-      tabIndex="-1"
-      style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-    >
+    <div className="modal fade show" tabIndex="-1" style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Cadastrar Reserva</h5>
-            <button
-              type="button"
-              className="btn-close"
-              onClick={onClose}
-            ></button>
+            <button type="button" className="btn-close" onClick={onClose}></button>
           </div>
           <div className="modal-body">
-            <form onSubmit={handleSubmit}>
-              {/* Campo de Busca com Sugestões */}
-              <div className="mb-3 position-relative">
+          <form
+  onSubmit={(e) => {
+    e.preventDefault();
+    if (typeof onSubmit === "function") {
+      onSubmit(newReservation); // Garante que a função `onSubmit` seja chamada
+    } else {
+      console.error("Função onSubmit não definida ou inválida!");
+    }
+  }}
+>
+              <div className="mb-3">
                 <label htmlFor="searchGuest" className="form-label d-flex align-items-center">
                   Buscar Hóspede
                   <a
@@ -127,50 +109,111 @@ const AddReservationModal = ({
                     Cadastrar
                   </a>
                 </label>
-                <input
-                  type="text"
-                  id="searchGuest"
-                  className="form-control"
-                  placeholder="Digite o nome do hóspede"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onFocus={() => setShowSuggestions(true)}
-                />
-                {showSuggestions && filteredGuests.length > 0 && (
-                  <ul className="list-group position-absolute w-100">
-                    {filteredGuests.map((guest) => (
-                      <li
-                        key={guest.id}
-                        className="list-group-item list-group-item-action"
-                        onClick={() => handleSelectGuest(guest)}
-                        style={{ cursor: "pointer" }}
-                      >
-                        {guest.name}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <div className="d-flex align-items-center">
+                  <AsyncSelect
+                    defaultOptions
+                    cacheOptions={false}
+                    value={
+                      filteredGuests.find((guest) => guest.value === newReservation.guest_id) || null
+                    }
+                    loadOptions={async (inputValue) => {
+                      if (!inputValue) return [];
+                      try {
+                        const response = await api.get(`/guests`);
+                        const normalizedInput = inputValue
+                          .toLowerCase()
+                          .normalize("NFD")
+                          .replace(/[\u0300-\u036f]/g, "");
+                        const options = response.data
+                          .filter((guest) =>
+                            guest.name
+                              .toLowerCase()
+                              .normalize("NFD")
+                              .replace(/[\u0300-\u036f]/g, "")
+                              .includes(normalizedInput)
+                          )
+                          .map((guest) => ({
+                            value: guest.id,
+                            label: guest.name,
+                          }));
+                        setFilteredGuests(options);
+                        return options;
+                      } catch (error) {
+                        console.error("Erro ao buscar hóspedes:", error);
+                        return [];
+                      }
+                    }}
+                    onChange={(selectedOption) => {
+                      if (selectedOption) {
+                        setNewReservation((prev) => ({
+                          ...prev,
+                          guest_id: selectedOption.value,
+                        }));
+                      }
+                    }}
+                    placeholder="Digite o nome do hóspede..."
+                    noOptionsMessage={() => "Nenhum hóspede encontrado"}
+                    className="flex-grow-1 me-2"
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-limpar"
+                    onClick={() => {
+                      setNewReservation((prev) => ({ ...prev, guest_id: "" }));
+                      setFilteredGuests([]);
+                    }}
+                  >
+                    Limpar
+                  </button>
+                </div>
               </div>
-
-              {/* Campo Quarto */}
+              <hr />
+              <div className="form-check">
+                <input
+                  type="checkbox"
+                  id="useCustomName"
+                  className="check-input"
+                  checked={useCustomName}
+                  onChange={() => setUseCustomName((prev) => !prev)}
+                />
+                <label htmlFor="useCustomName" className="small-checkbox"></label>
+                <label htmlFor="useCustomName" className="form-check-label">
+                  Adicionar nome usual?
+                </label>
+              </div>
+              {useCustomName && (
+                <div className="mb-3">
+                  <label htmlFor="customName" className="form-label">
+                    Nome usual:
+                  </label>
+                  <input
+                    type="text"
+                    id="customName"
+                    className="form-control"
+                    placeholder="Digite o nome usual"
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                  />
+                  <hr />
+                </div>
+              )}
               <div className="mb-3">
                 <label htmlFor="room_id" className="form-label">
                   Quarto
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   id="room_id"
                   name="room_id"
                   className="form-control"
                   value={newReservation.room_id}
-                  readOnly
+                  onChange={(e) => handleInputChange(e, setNewReservation)}
                 />
               </div>
-
-              {/* Data de Início */}
               <div className="mb-3">
                 <label htmlFor="startDate" className="form-label">
-                  Data de Início: (Check-in)
+                  Data de Início: 
+                  <span className="mb-2 text-muted">(Check-in)</span>
                 </label>
                 <input
                   type="date"
@@ -181,17 +224,32 @@ const AddReservationModal = ({
                   onChange={(e) =>
                     setNewReservation({
                       ...newReservation,
-                      start_date: `${e.target.value}T${newReservation.start_date.split("T")[1] || "13:00"}`,
+                      start_date: `${e.target.value}T${newReservation.checkin_time || "13:00"}`,
                     })
                   }
                   required
                 />
               </div>
-
-              {/* Data de Fim */}
+              <div className="mb-3">
+                <input
+                  type="time"
+                  id="checkinTime"
+                  name="checkinTime"
+                  className="form-control"
+                  value={newReservation.checkin_time}
+                  onChange={(e) =>
+                    setNewReservation({
+                      ...newReservation,
+                      checkin_time: e.target.value,
+                      start_date: `${newReservation.start_date.split("T")[0]}T${e.target.value}`,
+                    })
+                  }
+                />
+              </div>
               <div className="mb-3">
                 <label htmlFor="endDate" className="form-label">
-                  Data de Fim: (Check-out)
+                  Data de Fim:
+                  <span className="mb-2 text-muted">(Check-out)</span>
                 </label>
                 <input
                   type="date"
@@ -202,20 +260,42 @@ const AddReservationModal = ({
                   onChange={(e) =>
                     setNewReservation({
                       ...newReservation,
-                      end_date: `${e.target.value}T${newReservation.end_date.split("T")[1] || "12:00"}`,
+                      end_date: `${e.target.value}T${newReservation.checkout_time || "12:00"}`,
                     })
                   }
                   required
                 />
               </div>
-
-              {/* Valor da Diária */}
+              <div className="mb-3">
+                <input
+                  type="time"
+                  id="checkoutTime"
+                  name="checkoutTime"
+                  className="form-control"
+                  value={newReservation.checkout_time}
+                  onChange={(e) =>
+                    setNewReservation({
+                      ...newReservation,
+                      checkout_time: e.target.value,
+                      end_date: `${newReservation.end_date.split("T")[0]}T${e.target.value}`,
+                    })
+                  }
+                />
+              </div>
+              <div className="mb-3">
+                <label>Qtd. Diárias:</label>
+                <input
+                  type="text"
+                  id="totalDays"
+                  className="form-control"
+                  value={`${days}`}
+                  readOnly
+                />
+              </div>
               <div className="mb-3">
                 <label htmlFor="daily_rate" className="form-label">
                   Valor da Diária (R$)
-                  <span className="ms-2 text-muted">
-                    (Padrão: R$ {selectedRoom?.preco?.toFixed(2) || "0.00"})
-                  </span>
+                  <span className="ms-2 text-muted">(Padrão: R$ {selectedRoom?.preco?.toFixed(2) || "0.00"})</span>
                 </label>
                 <input
                   type="number"
@@ -224,32 +304,25 @@ const AddReservationModal = ({
                   name="daily_rate"
                   className="form-control"
                   value={newReservation.daily_rate}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange(e, setNewReservation)}
                   required
                 />
               </div>
-
-              {/* Valor Total */}
               <div className="mb-3">
                 <label htmlFor="total_amount" className="form-label">
                   Valor Total (R$)
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   id="total_amount"
                   name="total_amount"
                   className="form-control"
                   value={newReservation.total_amount}
-                  readOnly
+                  onChange={(e) => handleInputChange(e, setNewReservation)}
                 />
               </div>
-
               <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={onClose}
-                >
+                <button type="button" className="btn btn-secondary" onClick={onClose}>
                   Cancelar
                 </button>
                 <button type="submit" className="btn btn-primary">
