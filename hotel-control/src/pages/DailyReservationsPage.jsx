@@ -114,10 +114,10 @@ const DailyReservationsControl = () => {
           key={reservation.id}
           className="daily-cell daily-reserved"
           onClick={() => handleCellClick(room.id, day, reservation)}
-          title={`Check-in: ${moment(reservation.start_date).format("DD/MM/YYYY HH:mm")}, Check-out: ${moment(reservation.end_date).format("DD/MM/YYYY HH:mm")}`}
+          title={`Check-in: ${moment(reservation.start_date).format("DD/MM HH:mm")}, Check-out: ${moment(reservation.end_date).format("DD/MM HH:mm")}`}
         >
           <div>{reservation.custom_name || reservation.guest_name}</div>
-          <div>Entrada: {moment(reservation.start_date).format("DD/MM/YYYY HH:mm")} Saida: {moment(reservation.end_date).format("DD/MM/YYYY HH:mm")}</div>
+          <div>Entrada: {moment(reservation.start_date).format("DD/MM HH:mm")} Saida: {moment(reservation.end_date).format("DD/MM HH:mm")}</div>
         </div>
       ));
     }

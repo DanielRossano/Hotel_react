@@ -100,6 +100,9 @@ body {
 .daily-reserved {
     background-color: var(--reserved-bg-color);
     color: #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .daily-reserved:hover {
