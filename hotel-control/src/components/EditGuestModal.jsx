@@ -1,14 +1,70 @@
-import React from 'react';
-import Swal from "sweetalert2";
+import { useEffect } from "react";
+import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
+import { handleInputChange, handleAddressChange } from "../services/modalGuestsFunctions";
+import { toast } from "react-toastify";
 
-const EditGuestModal = ({
-  editGuest,
-  setEditGuest,
-  handleUpdateGuest,
-  handleDeleteGuest,
-}) => {
-  // Retorna null se editGuest não estiver definido
-  if (!editGuest) return null;
+const resetBodyState = () => {
+  document.body.classList.remove("modal-open");
+  document.body.style.overflow = "";
+  document.body.style.paddingRight = "";
+};
+
+const EditGuestModal = ({ editGuest, setEditGuest, handleUpdateGuest, handleDeleteGuest }) => {
+  useEffect(() => {
+    const modalElement = document.getElementById("editGuestModal");
+
+    if (modalElement) {
+      const modalBootstrap = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+      const resetOnClose = () => {
+        setEditGuest(null); // Reseta o estado do hóspede sendo editado
+        resetBodyState(); // Reseta o estado do body
+        const backdropElement = document.querySelector(".modal-backdrop");
+        if (backdropElement) backdropElement.remove(); // Remove backdrop extra
+      };
+
+      modalElement.addEventListener("hidden.bs.modal", resetOnClose);
+
+      return () => {
+        modalElement.removeEventListener("hidden.bs.modal", resetOnClose);
+      };
+    }
+  }, [setEditGuest]);
+
+  if (!editGuest) return null; // Evita renderizar se não houver hóspede em edição
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Valida CPF ou CNPJ
+    if (editGuest.type === "fisica" && !/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(editGuest.cpf_cnpj)) {
+      toast.error("Por favor, insira um CPF válido.");
+      return;
+    }
+
+    if (editGuest.type === "juridica" && !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(editGuest.cpf_cnpj)) {
+      toast.error("Por favor, insira um CNPJ válido.");
+      return;
+    }
+
+    handleUpdateGuest(editGuest); // Envia o hóspede atualizado
+  };
+
+  const confirmAndDeleteGuest = async () => {
+    if (window.confirm("Tem certeza de que deseja excluir este hóspede?")) {
+      try {
+        await handleDeleteGuest(editGuest.id); // Chama a função de exclusão
+        const modalElement = document.getElementById("editGuestModal");
+        if (modalElement) {
+          const modalBootstrap = bootstrap.Modal.getOrCreateInstance(modalElement);
+          modalBootstrap.hide(); // Fecha o modal
+        }
+      } catch (error) {
+        console.error("Erro ao excluir hóspede:", error);
+        toast.error("Não foi possível excluir o hóspede.");
+      }
+    }
+  };
 
   return (
     <div
@@ -31,32 +87,9 @@ const EditGuestModal = ({
               aria-label="Close"
             ></button>
           </div>
-          <div className="modal-body">
-            <form onSubmit={handleUpdateGuest}>
-              {/* Seleção do Tipo de Hóspede */}
-              <div className="mb-3 row">
-                <label htmlFor="editGuestType" className="col-sm-3 col-form-label">
-                  Tipo
-                </label>
-                <div className="col-sm-9">
-                  <select
-                    id="editGuestType"
-                    className="form-select form-select-sm"
-                    value={editGuest.type || ''}
-                    onChange={(e) =>
-                      setEditGuest({ ...editGuest, type: e.target.value })
-                    }
-                    required
-                  >
-                    <option value="fisica">Pessoa Física</option>
-                    <option value="juridica">Pessoa Jurídica</option>
-                  </select>
-                </div>
-              </div>
-
-              <hr />
-
-              {/* Input para Nome do Hóspede */}
+          <form onSubmit={handleSubmit}>
+            <div className="modal-body">
+              {/* Nome */}
               <div className="mb-3 row">
                 <label htmlFor="editGuestName" className="col-sm-3 col-form-label">
                   Nome
@@ -66,200 +99,76 @@ const EditGuestModal = ({
                     id="editGuestName"
                     type="text"
                     className="form-control"
-                    placeholder="Nome"
-                    value={editGuest.name || ''}
-                    onChange={(e) =>
-                      setEditGuest({ ...editGuest, name: e.target.value })
-                    }
+                    value={editGuest.name || ""}
+                    onChange={(e) => setEditGuest({ ...editGuest, name: e.target.value })}
                     required
                   />
                 </div>
               </div>
 
-              {/* Input para CPF/CNPJ do Hóspede */}
+              {/* CPF/CNPJ */}
               <div className="mb-3 row">
                 <label htmlFor="editGuestCPF" className="col-sm-3 col-form-label">
-                  {editGuest.type === 'fisica' ? 'CPF' : 'CNPJ'}
+                  {editGuest.type === "1" ? "CNPJ:" : "CPF:"}
                 </label>
                 <div className="col-sm-9">
                   <input
                     id="editGuestCPF"
                     type="text"
                     className="form-control"
-                    placeholder={editGuest.type === 'fisica' ? 'CPF' : 'CNPJ'}
-                    value={editGuest.cpf_cnpj || ''}
+                    placeholder={editGuest.type === "1" ? "CNPJ:" : "CPF:"}
+                    value={editGuest.cpf_cnpj || ""}
                     onChange={(e) =>
-                      setEditGuest({ ...editGuest, cpf_cnpj: e.target.value })
+                      handleInputChange(
+                        e.target.value,
+                        editGuest.type === "0" ? "999.999.999-99" : "99.999.999/9999-99",
+                        "cpf_cnpj",
+                        editGuest,
+                        setEditGuest
+                      )
                     }
                     required
                   />
                 </div>
               </div>
 
-              {/* Input para Nome Fantasia (apenas para tipo juridica) */}
-              {editGuest.type === 'juridica' && (
-                <div className="mb-3 row">
+              {/* Campos de Endereço */}
+              {["estado", "cidade", "bairro", "rua", "numero", "cep"].map((field) => (
+                <div key={field} className="mb-3 row">
                   <label
-                    htmlFor="editGuestFantasyName"
+                    htmlFor={`editGuest${field}`}
                     className="col-sm-3 col-form-label"
                   >
-                    Fantasia
+                    {field[0].toUpperCase() + field.slice(1)}
                   </label>
                   <div className="col-sm-9">
                     <input
-                      id="editGuestFantasyName"
+                      id={`editGuest${field}`}
                       type="text"
                       className="form-control"
-                      placeholder="Nome Fantasia"
-                      value={editGuest.nome_fantasia || ''}
-                      onChange={(e) =>
-                        setEditGuest({
-                          ...editGuest,
-                          nome_fantasia: e.target.value,
-                        })
-                      }
+                      value={editGuest.address[field] || ""}
+                      onChange={(e) => handleAddressChange(e.target.value, field, setEditGuest)}
                     />
                   </div>
                 </div>
-              )}
-
-              <hr />
-
-              {/* Inputs para Endereço do Hóspede */}
-
-{/* Estado */}
-<div className="mb-3 row">
-  <label htmlFor="editGuestEstado" className="col-sm-3 col-form-label">
-    Estado
-  </label>
-  <div className="col-sm-9">
-    <select
-      id="editGuestEstado"
-      className="form-select"
-      value={editGuest.address?.estado || ""}
-      onChange={(e) =>
-        setEditGuest({
-          ...editGuest,
-          address: {
-            ...editGuest.address,
-            estado: e.target.value,
-          },
-        })
-      }
-      required
-    >
-      <option value="" disabled>
-        Selecione um Estado
-      </option>
-      {[
-        "AC",
-        "AL",
-        "AP",
-        "AM",
-        "BA",
-        "CE",
-        "DF",
-        "ES",
-        "GO",
-        "MA",
-        "MT",
-        "MS",
-        "MG",
-        "PA",
-        "PB",
-        "PR",
-        "PE",
-        "PI",
-        "RJ",
-        "RN",
-        "RS",
-        "RO",
-        "RR",
-        "SC",
-        "SP",
-        "SE",
-        "TO",
-      ].map((estado) => (
-        <option key={estado} value={estado}>
-          {estado}
-        </option>
-      ))}
-    </select>
-  </div>
-</div>
-
-{/* Outros Campos de Endereço */}
-{["cidade", "bairro", "rua", "numero", "cep"].map((field) => (
-  <div key={field} className="mb-3 row">
-    <label htmlFor={`editGuest${field}`} className="col-sm-3 col-form-label">
-      {field[0].toUpperCase() + field.slice(1)}
-    </label>
-    <div className="col-sm-9">
-      <input
-        id={`editGuest${field}`}
-        type="text"
-        className="form-control"
-        placeholder={field[0].toUpperCase() + field.slice(1)}
-        value={editGuest.address?.[field] || ""}
-        onChange={(e) =>
-          setEditGuest({
-            ...editGuest,
-            address: {
-              ...editGuest.address,
-              [field]: e.target.value,
-            },
-          })
-        }
-        required
-      />
-    </div>
-  </div>
-))}
-
-
-              <div className="modal-footer d-flex justify-content-between">
-                {/* Botão para Excluir Hóspede */}
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={() => {
-                    Swal.fire({
-                      title: "Tem certeza?",
-                      text: "Esta ação não poderá ser desfeita",
-                      showCancelButton: true,
-                      confirmButtonColor: "#d33",
-                      cancelButtonColor: "#0099c6",
-                      confirmButtonText: "Sim",
-                      cancelButtonText: "Cancelar",
-                    }).then((result) => {
-                      if (result.isConfirmed) {
-                        handleDeleteGuest(editGuest.id);
-                      }
-                    });
-                  }}
-                >
-                  Excluir
-                </button>
-                <div>
-                  {/* Botão para Cancelar Edição */}
-                  <button
-                    type="button"
-                    className="btn btn-secondary me-2"
-                    data-bs-dismiss="modal"
-                  >
-                    Cancelar
-                  </button>
-                  {/* Botão para Salvar Alterações */}
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                  >
-                    Salvar Alterações
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
+              ))}
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                Cancelar
+              </button>
+              <button type="submit" className="btn btn-primary">
+                Salvar
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={confirmAndDeleteGuest}
+              >
+                Excluir
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

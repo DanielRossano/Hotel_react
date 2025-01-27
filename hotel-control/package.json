@@ -12,6 +12,8 @@
     "bootstrap": "^5.3.3",
     "cra-template": "1.2.0",
     "date-fns": "^4.1.0",
+    "docx": "^9.1.1",
+    "file-saver": "^2.0.5",
     "hotel-control": "file:",
     "moment": "^2.30.1",
     "react": "^18.2.0",
@@ -23,6 +25,7 @@
     "react-input-mask-next": "^3.0.0-alpha.12",
     "react-router-dom": "^6.14.1",
     "react-scripts": "^5.0.1",
+    "react-select": "^5.10.0",
     "react-toastify": "^11.0.2",
     "sweetalert2": "^11.6.13",
     "web-vitals": "^4.2.4"

@@ -1,43 +1,86 @@
 /* Filtros */
 .filters {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.filters input {
-  padding: 8px;
-  font-size: 14px;
+.filters .search-container input {
   border: 1px solid #ddd;
   border-radius: 5px;
-  width: 65%;
+  padding: 5px 10px;
+  transition: border-color 0.3s ease-in-out;
 }
 
-.filters button {
+.filters .search-container input:focus {
+  border-color: #0099c6;
+  box-shadow: 0 0 5px rgba(0, 153, 198, 0.3);
+  outline: none;
+}
+
+
+/* Botões */
+button.btn-primary {
   font-size: 14px;
-  padding: 8px 15px;
+  padding: 10px 20px;
   border-radius: 5px;
-  cursor: pointer;
   border: none;
-}
-
-.filters .btn-primary {
-  background-color: #0099c6; /* Edit Buttons */
+  background-color: #0099c6;
   color: white;
+  cursor: pointer;
 }
 
-.filters .btn-primary:hover {
+button.btn-primary:hover {
   background-color: #007896;
 }
 
-.filters .btn-success {
-  background-color: #4caf50; /* Save Buttons */
-  color: white;
+button.btn-light {
+  font-size: 14px;
 }
 
-.filters .btn-success:hover {
-  background-color: #45a049;
+button.btn-light:hover {
+  background-color: #f0f0f0;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .search-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+
+
+button.btn-primary {
+  font-size: 14px;
+  padding: 8px 15px;
+  border-radius: 5px;
+  border: none;
+  background-color: #0099c6;
+  color: white;
+  cursor: pointer;
+}
+
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .search-container {
+    flex-direction: column;
+    gap: 5px;
+  }
 }
 
 /* Lista de Hóspedes */
@@ -153,3 +196,22 @@ body {
   background-color: #007896;
   color: white;
 }
+
+.form-control.search-input {
+  width: 100%; /* Campo ocupa 100% do espaço do container */
+  padding: 8px 40px 8px 10px; /* Espaço para o botão "X" */
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box; /* Garante que o padding e a borda sejam incluídos no tamanho */
+}
+
+.form-control.search-input:focus {
+  border-color: #aaa; /* Cor da borda ao focar */
+  outline: none; /* Remove o outline padrão */
+}
+
+.form-control.search-input::placeholder {
+  color: #999; /* Cor do placeholder */
+}
+

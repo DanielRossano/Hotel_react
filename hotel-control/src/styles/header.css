@@ -1,7 +1,7 @@
 /* Header */
 .header {
   height: 60px;
-  background-color: #005f73; /* Paleta de cores */
+  background-color: #004080;
   color: #ffffff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   display: flex;
