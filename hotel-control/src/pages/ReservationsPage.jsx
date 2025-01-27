@@ -92,72 +92,58 @@ const ReservationsPage = () => {
     setEndDate(filterEndDate.clone());
     toast.success("Filtro aplicado com sucesso!");
   };
-  
-  const handleAddReservation = async (reservation) => {
-    try {
-      const newReservation = await createReservation(reservation);
-  
-      // Busca o nome do hóspede correspondente
-      const guest = guests.find((g) => g.id === newReservation.guest_id);
-      const updatedReservation = { ...newReservation, guest_name: guest?.name || "Hóspede não encontrado" };
-  
-      // Atualiza as reservas no estado global
-      setReservations((prev) => [...prev, updatedReservation]);
-  
-      // Verifica se a nova reserva está dentro do intervalo de filtros aplicados
-      const reservationStart = moment(updatedReservation.start_date, "YYYY-MM-DDTHH:mm:ss");
-      const reservationEnd = moment(updatedReservation.end_date, "YYYY-MM-DDTHH:mm:ss");
-      if (
-        reservationStart.isBetween(filterStartDate, filterEndDate, null, "[]") ||
-        reservationEnd.isBetween(filterStartDate, filterEndDate, null, "[]") ||
-        (reservationStart.isBefore(filterStartDate) && reservationEnd.isAfter(filterEndDate))
-      ) {
-        setFilteredReservations((prev) => [...prev, updatedReservation]);
-      }
-  
-      setShowAddModal(false);
-      toast.success("Reserva cadastrada com sucesso!");
-    } catch (error) {
-      console.error("Erro ao cadastrar reserva:", error);
-      toast.error("Erro ao cadastrar reserva. Tente novamente.");
-    }
-  };
-  
-  const handleUpdateReservation = async (updatedReservation) => {
-    try {
-      const updatedData = await updateReservation(updatedReservation);
-      setReservations((prev) =>
-        prev.map((res) => (res.id === updatedData.id ? updatedData : res))
-      );
-      setFilteredReservations((prev) =>
-        prev.map((res) => (res.id === updatedData.id ? updatedData : res))
-      );
-      setEditReservation(null);
-      toast.success("Reserva atualizada com sucesso!");
-    } catch (error) {
-      console.error("Erro ao atualizar reserva:", error);
-      toast.error("Erro ao atualizar reserva.");
-    }
-  };
-  
-  const handleDeleteReservation = async (reservationId) => {
-    try {
-      await deleteReservation(reservationId);
-      setReservations((prev) => prev.filter((res) => res.id !== reservationId));
-      setFilteredReservations((prev) =>
-        prev.filter((res) => res.id !== reservationId)
-      );
-      setEditReservation(null);
-      toast.success("Reserva excluída com sucesso!");
-    } catch (error) {
-      console.error("Erro ao excluir reserva:", error);
-      toast.error("Erro ao excluir reserva. Tente novamente.");
-    }
-  };
-  
-  useEffect(() => {
-    applyFilter();
-  }, [reservations]);
+ // Recarregar dados
+const reloadReservations = async () => {
+  try {
+    const { reservations } = await loadRoomsAndReservations();
+    setReservations(reservations);
+    setFilteredReservations(reservations);
+    toast.success("Reservas atualizadas com sucesso!");
+  } catch (error) {
+    console.error("Erro ao recarregar reservas:", error);
+    toast.error("Erro ao recarregar reservas.");
+  }
+};
+
+// **Adicionar Reserva**
+const handleAddReservation = async (reservation) => {
+  try {
+    await createReservation(reservation);
+    await reloadReservations(); // Recarrega dados após adicionar
+    setShowAddModal(false);
+    toast.success("Reserva cadastrada com sucesso!");
+  } catch (error) {
+    console.error("Erro ao cadastrar reserva:", error);
+    toast.error("Erro ao cadastrar reserva. Tente novamente.");
+  }
+};
+
+// **Atualizar Reserva**
+const handleUpdateReservation = async (updatedReservation) => {
+  try {
+    await updateReservation(updatedReservation);
+    await reloadReservations(); // Recarrega dados após editar
+    setEditReservation(null);
+    toast.success("Reserva atualizada com sucesso!");
+  } catch (error) {
+    console.error("Erro ao atualizar reserva:", error);
+    toast.error("Erro ao atualizar reserva.");
+  }
+};
+
+// **Excluir Reserva**
+const handleDeleteReservation = async (reservationId) => {
+  try {
+    await deleteReservation(reservationId);
+    await reloadReservations(); // Recarrega dados após excluir
+    setEditReservation(null);
+    toast.success("Reserva excluída com sucesso!");
+  } catch (error) {
+    console.error("Erro ao excluir reserva:", error);
+    toast.error("Erro ao excluir reserva. Tente novamente.");
+  }
+};
+
 
   // **Gerar Conteúdo das Células**
   const renderCellContent = (room, day) => {
@@ -246,8 +232,11 @@ const ReservationsPage = () => {
       {showAddModal && (
         <AddReservationModal
         isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSubmit={(reservation) => handleAddReservation(reservation)}
+        onClose={async () => {
+          setShowAddModal(false);
+          await reloadReservations(); // Recarrega ao fechar o modal
+        }}
+        onSubmit={handleAddReservation}
         selectedRoom={selectedRoom}
         selectedDate={selectedDate}
         guests={guests}
@@ -257,7 +246,10 @@ const ReservationsPage = () => {
        <EditReservationModal
        editReservation={editReservation}
   setEditReservation={setEditReservation}
-  onClose={() => setEditReservation(null)}
+  onClose={async () => {
+    setEditReservation(null);
+    await reloadReservations(); // Recarrega ao fechar o modal
+  }}
   onSubmit={handleUpdateReservation}
   handleDeleteReservation={handleDeleteReservation}
        rooms={rooms}
