@@ -22,6 +22,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 // Cadastrar nova reserva
 router.post('/', async (req, res) => {
   const { room_id, guest_id, start_date, end_date, daily_rate, custom_name } = req.body;
@@ -31,11 +32,9 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    // Formatar as datas para o formato compatível com MySQL
     const formattedStartDate = moment(start_date).format('YYYY-MM-DD HH:mm:ss');
     const formattedEndDate = moment(end_date).format('YYYY-MM-DD HH:mm:ss');
 
-    // Verificar conflitos de datas para o quarto
     const [conflictingReservations] = await db.query(`
       SELECT * FROM reservations 
       WHERE room_id = ? 
@@ -50,7 +49,6 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'O quarto já está reservado para o período selecionado.' });
     }
 
-    // Verificar a validade das datas
     const start = moment(start_date);
     const end = moment(end_date);
 
@@ -58,12 +56,9 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Datas inválidas. O check-out deve ser após o check-in.' });
     }
 
-    // Calcular a quantidade de dias, considerando diferenças menores que 24 horas como 1 diária
     const days = Math.ceil(end.diff(start, 'hours') / 24);
-
     const total_amount = days * daily_rate;
 
-    // Inserir a reserva no banco de dados
     const [result] = await db.query(`
       INSERT INTO reservations 
       (room_id, guest_id, start_date, end_date, daily_rate, total_amount, amount_paid, custom_name) 
@@ -96,14 +91,12 @@ router.put('/:id', async (req, res) => {
   }
 
   try {
-    // Formatar as datas para o formato compatível com MySQL
     const formattedStartDate = moment(start_date).format('YYYY-MM-DD HH:mm:ss');
     const formattedEndDate = moment(end_date).format('YYYY-MM-DD HH:mm:ss');
 
-    // Calcular o número de dias considerando apenas as datas (ignorar as horas)
     const start = moment(formattedStartDate).startOf('day');
     const end = moment(formattedEndDate).startOf('day');
-    const days = end.diff(start, 'days') + 1; // Adiciona 1 para considerar o mesmo dia como válido
+    const days = end.diff(start, 'days') + 1;
 
     if (days <= 0) {
       return res.status(400).json({ error: 'Datas inválidas.' });
@@ -111,14 +104,11 @@ router.put('/:id', async (req, res) => {
 
     const total_amount = days * daily_rate;
 
-    const [result] = await db.query(
-      `
+    const [result] = await db.query(`
       UPDATE reservations 
       SET room_id = ?, guest_id = ?, start_date = ?, end_date = ?, daily_rate = ?, total_amount = ?, custom_name = ? 
       WHERE id = ?
-    `,
-      [room_id, guest_id, formattedStartDate, formattedEndDate, daily_rate, total_amount, custom_name, id]
-    );
+    `, [room_id, guest_id, formattedStartDate, formattedEndDate, daily_rate, total_amount, custom_name, id]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Reserva não encontrada.' });
@@ -142,7 +132,7 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Reserva não encontrada.' });
     }
 
-    res.json({ message: 'Reserva cancelada com sucesso.' }); // Retorno claro
+    res.json({ message: 'Reserva cancelada com sucesso.' });
   } catch (error) {
     console.error('Erro ao cancelar reserva:', error);
     res.status(500).json({ error: error.message });

@@ -6,7 +6,7 @@ import "../styles/ReservationsPage.css";
 import { handleInputChange, calculateTotalAndDays, handleDeleteReservation } from "../services/reservationsFunctions";
 
 const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, editReservation, setEditReservation }) => {
-  const [useCustomName, setUseCustomName] = useState(!!editReservation?.custom_name); // true se custom_name existir
+  const [useCustomName, setUseCustomName] = useState(!!editReservation?.custom_name);
   const [customName, setCustomName] = useState(editReservation?.custom_name || "");
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredGuests, setFilteredGuests] = useState([]);
@@ -62,15 +62,12 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
 
   useEffect(() => {
     if (editReservation?.guest_id && !filteredGuests.length) {
-      setFilteredGuests([
-        {
-          value: editReservation.guest_id,
-          label: editReservation.guest_name || "Hóspede carregado",
-        },
-      ]);
+      setFilteredGuests([{
+        value: editReservation.guest_id,
+        label: editReservation.guest_name || "Hóspede carregado",
+      }]);
     }
   }, [editReservation, filteredGuests.length]);
-  
 
   const { total, days } = calculateTotalAndDays(updatedReservation);
 
@@ -93,7 +90,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                 if (typeof onSubmit === "function") {
                   onSubmit({
                     ...updatedReservation,
-                    custom_name: useCustomName ? customName : null, // Inclui o customName no envio
+                    custom_name: useCustomName ? customName : null,
                   });
                 } else {
                   console.error("Função onSubmit não definida ou inválida!");
@@ -166,15 +163,18 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                     className="flex-grow-1 me-2"
                   />
                   <button
-                    type="button"
-                    className="btn btn-limpar"
-                    onClick={() => {
-                      setUpdatedReservation((prev) => ({ ...prev, guest_id: "" }));
-                      setFilteredGuests([]);
-                    }}
-                  >
-                    Limpar
-                  </button>
+  type="button"
+  className="btn btn-limpar"
+  onClick={() => {
+    setUpdatedReservation((prev) => ({ ...prev, guest_id: "" }));
+    setFilteredGuests([]);
+    setSearchTerm("");
+    setEditReservation((prev) => ({ ...prev, guest_id: "", guest_name: "" }));
+  }}
+>
+  Limpar
+</button>
+
                 </div>
               </div>
               <hr />
@@ -191,21 +191,21 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                 </label>
               </div>
               {useCustomName && (
-  <div className="mb-3">
-    <label htmlFor="customName" className="form-label">
-      Nome usual:
-    </label>
-    <input
-      type="text"
-      id="customName"
-      className="form-control"
-      placeholder="Digite o nome usual"
-      value={customName}
-      onChange={(e) => setCustomName(e.target.value)}
-    />
-    <hr />
-  </div>
-)}
+                <div className="mb-3">
+                  <label htmlFor="customName" className="form-label">
+                    Nome usual:
+                  </label>
+                  <input
+                    type="text"
+                    id="customName"
+                    className="form-control"
+                    placeholder="Digite o nome usual"
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                  />
+                  <hr />
+                </div>
+              )}
               <div className="mb-3">
                 <label htmlFor="room_id" className="form-label">
                   Quarto
@@ -317,7 +317,6 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   required
                 />
               </div>
-             
               <div className="mb-3">
                 <label htmlFor="total_amount" className="form-label">
                   Valor Total (R$)
@@ -334,7 +333,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
               <div className="modal-footer">
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className="btn btn-limpar"
                   onClick={onClose}
                 >
                   Voltar

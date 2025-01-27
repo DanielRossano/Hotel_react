@@ -1,0 +1,89 @@
+/* Conteúdo interno das células */
+.table div.cell-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Células Disponíveis */
+.table div.available {
+    background-color: #e8faff;
+    color: #000000;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    border-left: 1px solid #ccc; /* Mantém borda para células disponíveis */
+}
+
+.table div.available:hover {
+    background-color: #c3f0c3;
+}
+
+/* Células Reservadas */
+.table div.reserved {
+    background-color: #ffd580;
+    color: #000;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    white-space: nowrap; /* Impede quebra de linha */
+    overflow: hidden; /* Esconde texto excedente */
+    text-overflow: ellipsis; /* Adiciona "..." ao texto que ultrapassar o limite */
+    padding-left: 5px; /* Adiciona um espaçamento do lado esquerdo */
+    border: none; /* Remove as bordas */
+}
+
+.table div.reserved:hover {
+    background-color: #ffc107;
+}
+
+/* Células divididas verticalmente */
+.split-cell {
+    display: flex;
+    flex-direction: row; /* Divisão lateral */
+    width: 100%;
+    height: 100%;
+    border: none; /* Remove borda entre células divididas */
+}
+
+.split-cell .half {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border: none; /* Remove borda das metades */
+}
+
+/* Metades disponíveis nas células divididas */
+.split-cell .half.available {
+    background-color: #e8faff;
+    color: #000;
+    text-align: left;
+    padding-left: 5px;
+}
+
+.split-cell .half.available:hover {
+    background-color: #c3f0c3;
+}
+
+/* Metades reservadas nas células divididas */
+.split-cell .half.reserved {
+    background-color: #ffd580;
+    color: #000;
+    padding-left: 5px;
+}
+
+/* Primeira metade reservada */
+.split-cell .half.reserved:first-child {
+    border-right: 1px solid #ccc; /* Adiciona borda à direita */
+}
+
+/* Segunda metade reservada */
+.split-cell .half.reserved:last-child {
+    border-left: 1px solid #ccc; /* Adiciona borda à esquerda */
+}

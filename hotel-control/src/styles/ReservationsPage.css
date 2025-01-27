@@ -40,118 +40,6 @@ button.btn-outline-primary:hover {
   color: #fff;
 }
 
-/* Tabela */
-.table {
-  border-collapse: collapse;
-  table-layout: fixed;
-  width: 100%;
-}
-
-.table th {
-  background-color: #004080;
-  color: #ffffff;
-  text-align: center;
-  padding: 8px;
-  font-weight: bold;
-  border-top: 1px solid #000000;
-  border-bottom: 1px solid #000000;
-}
-
-.table td {
-  position: relative;
-  padding: 0; /* Remove padding para alinhar o conteúdo */
-  text-align: center;
-  font-size: 12px;
-  border: 1px solid #ddd;
-  height: 25px; /* Altura consistente para células */
-}
-
-/* Conteúdo interno das células */
-.table div.cell-content {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.table div.cell-content {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
-/* Células Disponíveis */
-.table div.available {
-  background-color: #e8faff;
-  color: #000000;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
-}
-
-.table div.available:hover {
-  background-color: #c3f0c3;
-}
-
-/* Células Reservadas */
-.table div.reserved {
-  background-color: #ffd580;
-  color: #000;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
-
-  white-space: nowrap; /* Impede que o nome crie uma nova linha */
-  overflow: hidden; /* Esconde o texto que ultrapassar o limite da célula */
-}
-
-.table div.reserved:hover {
-  background-color: #ffc107;
-}
-
-/* Células divididas */
-.split-cell {
-  display: flex;
-  width: 100%;
-  height: 100%;
-}
-.split-cell .half {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-right: 1px solid #ddd;
-  border-left: 1px solid #ddd;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.split-cell .half:last-child {
-  border-right: none; /* Remove borda na última metade */
-}
-
-.split-cell .half.available {
-  background-color: #e8faff;
-  color: #000000;
-}
-
-.split-cell .half.available:hover {
-  background-color: #c3f0c3;
-}
-
-.split-cell .half.reserved {
-  background-color: #ffd580;
-  color: #000;
-}
-
-.split-cell .half.reserved:hover {
-  background-color: #ffc107;
-}
-
 /* Modal */
 .modal-dialog {
   max-width: 600px;
@@ -243,7 +131,7 @@ div.form-check > .form-check-label {
 
 /* Botão Limpar */
 button.btn-limpar {
-  background-color: #ccc;
+  background-color: #0099c6;
   color: #fff;
   border: 2px solid #000000;
   padding: 8px 12px;
@@ -252,23 +140,7 @@ button.btn-limpar {
 }
 
 button.btn-limpar:hover {
-  background-color: #acacac;
+  background-color: #0080a7;
   border-color: #000000;
-}
-
-/* Estilos Responsivos */
-@media (max-width: 768px) {
-  .table th {
-    font-size: 12px;
-    padding: 8px;
-  }
-
-  .table td {
-    font-size: 12px;
-    height: 30px;
-  }
-
-  button.btn-outline-primary {
-    padding: 6px 10px;
-  }
+  color: #fff;
 }

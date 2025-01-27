@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import handleDeleteGuest from '../services/guestsFunctions';
 import EditGuestModal from '../components/EditGuestModal';
 import AddGuestModal from '../components/AddGuestModal';
 import { toast, ToastContainer } from 'react-toastify';
