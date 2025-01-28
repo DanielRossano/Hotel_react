@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { saveAs } from "file-saver";
 import { Document, Packer, Paragraph, Table, TableRow, TableCell, AlignmentType, WidthType } from "docx";
 import api from "../services/api";
-import { loadRoomsAndReservations, handleAddReservation, handleDeleteReservation, handleUpdateReservation } from "../services/reservationsFunctions";
+import { loadRoomsAndReservations, handleAddReservation, handleDeleteReservation, handleUpdateReservation, validateReservation } from "../services/reservationsFunctions";
 import AddReservationModal from "../components/AddReservationModal";
 import EditReservationModal from "../components/EditReservationModal";
 import "../styles/DailyReservationsPage.css";
@@ -14,6 +14,7 @@ import "../styles/cells.css";
 import "../styles/table.css";
 
 const DailyReservationsControl = () => {
+  const [modalError, setModalError] = useState(null); // Estado para armazenar erros no modal
   const [rooms, setRooms] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [filteredReservations, setFilteredReservations] = useState([]);
@@ -263,16 +264,24 @@ const DailyReservationsControl = () => {
       {showAddModal && (
         <AddReservationModal
           isOpen={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          onSubmit={async (reservation) => {
-            await handleAddReservation(reservation, reloadReservations);
+          onClose={() => {
             setShowAddModal(false);
+            setModalError(null); // Limpa o erro ao fechar o modal
+          }}
+          onSubmit={async (newReservation) => {
+            if (!validateReservation(newReservation)) return; // Validação inicial
+            const result = await handleAddReservation(newReservation, reloadReservations, setModalError);
+            if (result) {
+              setShowAddModal(false); // Fecha o modal somente se a reserva for adicionada com sucesso
+            }
           }}
           selectedRoom={selectedRoom}
           selectedDate={selectedDate}
           guests={guests}
+          modalError={modalError}
         />
       )}
+
       {editReservation && (
         <EditReservationModal
           editReservation={editReservation}
@@ -280,15 +289,17 @@ const DailyReservationsControl = () => {
           onClose={async () => {
             setEditReservation(null);
             await reloadReservations(); // Garante que as reservas sejam recarregadas ao fechar o modal
+            setModalError(null); // Limpa o erro ao fechar o modal
           }}
           onSubmit={async (updatedReservation) => {
-            await handleUpdateReservation(updatedReservation, reloadReservations, setEditReservation);
+            await handleUpdateReservation(updatedReservation, reloadReservations, setEditReservation, setModalError);
           }}
           handleDeleteReservation={async (reservationId) => {
             await handleDeleteReservation(reservationId, reloadReservations, setEditReservation);
           }}
           rooms={rooms}
           guests={guests}
+          modalError={modalError}
         />
       )}
     </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { ToastContainer } from 'react-toastify';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -10,10 +11,11 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import ReservationsPage from './pages/ReservationsPage';
 import './App.css';
 import RoomsPage from './pages/RoomsPage';
-import AddReservation from './pages/AddReservation';
 import DailyReservationsPage from './pages/DailyReservationsPage';
 
 const App = () => (
+  <div>
+      <ToastContainer />
   <Router>
     <div className="app">
       <Header />
@@ -23,7 +25,7 @@ const App = () => (
           <Routes>
             <Route path="/guests" element={<GuestsPage />} />
             <Route path="/reservations" element={<ReservationsPage />} />
-            <Route path="/Addreservations" element={<AddReservation/>} />
+            <Route path="" element={<ReservationsPage />} />
             <Route path="/rooms" element={<RoomsPage />} />
             <Route path="/daily-reservations" element={<DailyReservationsPage />} />
           </Routes>
@@ -31,6 +33,7 @@ const App = () => (
       </div>
     </div>
   </Router>
+  </div>
 );
 
 export default App;

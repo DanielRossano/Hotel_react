@@ -49,27 +49,27 @@ export const createReservation = async (newReservation) => {
     return response.data;
   } catch (error) {
     console.error('Erro ao cadastrar reserva:', error);
-    const errorMessage =
-      error.response?.data?.error || 'Erro ao cadastrar reserva. Tente novamente.';
-    toast.error(errorMessage);
     throw error;
   }
 };
 
-// Handle Add Reservation
-export const handleAddReservation = async (newReservation, updateReservations) => {
+// Lida com a criação de uma nova reserva
+export const handleAddReservation = async (newReservation, updateReservations, setModalError) => {
   try {
-    const createdReservation = await createReservation(newReservation);
-    const updatedReservations = await fetchReservations(); // Atualiza a lista
+    const createdReservation = await createReservation(newReservation); // Faz o cadastro
+    const updatedReservations = await fetchReservations(); // Atualiza as reservas
     updateReservations(updatedReservations); // Atualiza o estado no componente pai
     toast.success('Reserva adicionada com sucesso!');
-    return createdReservation; // Retorna a nova reserva criada
+    setModalError(null); // Limpa mensagens de erro no modal
+    return createdReservation; // Retorna a reserva criada
   } catch (error) {
-    toast.error('Erro ao adicionar reserva:', error);
-    throw error;
+    console.error('Erro ao adicionar reserva:', error);
+    const errorMessage =
+      error.response?.data?.error || 'Erro ao adicionar reserva. Tente novamente.';
+    toast.error(errorMessage);
+    return null; // Retorna null em caso de erro
   }
 };
-
 // Atualizar o pagamento de uma reserva
 export const updateReservationPayment = async (id, amountPaid) => {
   try {
@@ -99,25 +99,30 @@ export const updateReservation = async (updatedReservation) => {
   try {
     const { id, ...data } = updatedReservation;
     const response = await api.put(`/reservations/${id}`, data);
-    toast.success('Reserva atualizada com sucesso!');
     return response.data;
   } catch (error) {
     console.error('Erro ao atualizar reserva:', error);
-    toast.error('Erro ao atualizar reserva.');
     throw error;
   }
 };
 
 // Lida com a atualização de reserva
-export const handleUpdateReservation = async (updatedReservation, reloadReservations, setEditReservation) => {
+export const handleUpdateReservation = async (updatedReservation, reloadReservations, setEditReservation, setModalError) => {
   try {
-    await updateReservation(updatedReservation); // Chama a função para atualizar no backend
-    await reloadReservations(); // Atualiza as reservas no estado
+    // Validação inicial
+    if (!validateReservation(updatedReservation)) {
+      return;
+    }
+
+    await updateReservation(updatedReservation); // Atualiza a reserva no backend
+    await reloadReservations(); // Recarrega as reservas no estado
     setEditReservation(null); // Fecha o modal
     toast.success("Reserva atualizada com sucesso!");
   } catch (error) {
     console.error("Erro ao atualizar reserva:", error);
-    toast.error("Erro ao atualizar reserva.");
+    const errorMessage = error.response?.data?.error || "Erro ao atualizar reserva. Tente novamente.";
+    setModalError(errorMessage); // Define a mensagem de erro para exibição no modal
+    toast.error(errorMessage); // Notifica o erro
   }
 };
 
@@ -189,4 +194,20 @@ export const calculateTotalAndDays = (reservation) => {
     return { total: total.toFixed(2), days };
   }
   return { total: "0.00", days: 0 };
+};
+
+export const validateReservation = (reservation) => {
+  if (!reservation.room_id) {
+    toast.error("Por favor, selecione um quarto.");
+    return false;
+  }
+  if (!reservation.start_date || !reservation.end_date) {
+    toast.error("Por favor, preencha as datas de início e fim.");
+    return false;
+  }
+  if (moment(reservation.start_date).isAfter(moment(reservation.end_date))) {
+    toast.error("A data de início deve ser anterior à data de fim.");
+    return false;
+  }
+  return true;
 };

@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from "react";
 import moment from "moment";
 import "moment/locale/pt-br";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import AddReservationModal from "../components/AddReservationModal";
 import EditReservationModal from "../components/EditReservationModal";
-import {
-  loadRoomsAndReservations,
-  fetchGuests,
-  handleUpdateReservation,
-  handleDeleteReservation, handleAddReservation
-} from "../services/reservationsFunctions";
+import { loadRoomsAndReservations, fetchGuests, handleUpdateReservation, handleDeleteReservation, handleAddReservation, validateReservation } from "../services/reservationsFunctions";
 import "../styles/ReservationsPage.css";
 import "../styles/cells.css";
 import "../styles/table.css";
@@ -21,6 +16,7 @@ const ReservationsPage = () => {
   const [reservations, setReservations] = useState([]);
   const [filteredReservations, setFilteredReservations] = useState([]);
   const [guests, setGuests] = useState([]);
+  const [modalError, setModalError] = useState(null); // Estado para armazenar erros no modal
 
   // **Estados de Controle**
   const [startDate, setStartDate] = useState(moment().startOf("day")); // Dia atual
@@ -44,7 +40,6 @@ const ReservationsPage = () => {
         setReservations(reservations);
         setFilteredReservations(reservations);
       } catch (error) {
-        console.error("Erro ao carregar dados:", error);
         toast.error("Erro ao carregar quartos e reservas.");
       }
     };
@@ -54,7 +49,6 @@ const ReservationsPage = () => {
         const fetchedGuests = await fetchGuests();
         setGuests(fetchedGuests);
       } catch (error) {
-        console.error("Erro ao carregar hóspedes:", error);
         toast.error("Erro ao carregar hóspedes.");
       }
     };
@@ -92,16 +86,15 @@ const ReservationsPage = () => {
     setEndDate(filterEndDate.clone());
   };
 
-const reloadReservations = async () => {
-  try {
-    const { reservations } = await loadRoomsAndReservations(); // Recarrega os dados
-    setReservations(reservations); // Atualiza o estado global
-    setFilteredReservations(reservations); // Atualiza o estado filtrado
-  } catch (error) {
-    console.error("Erro ao recarregar reservas:", error);
-    toast.error("Erro ao recarregar reservas.");
-  }
-};
+  const reloadReservations = async () => {
+    try {
+      const { reservations } = await loadRoomsAndReservations(); // Recarrega os dados
+      setReservations(reservations); // Atualiza o estado global
+      setFilteredReservations(reservations); // Atualiza o estado filtrado
+    } catch (error) {
+      toast.error("Erro ao recarregar reservas.");
+    }
+  };
 
   // **Gerar Conteúdo das Células**
   const renderCellContent = (room, day) => {
@@ -110,21 +103,20 @@ const reloadReservations = async () => {
         res.room_id === room.id &&
         moment(day).isBetween(res.start_date, res.end_date, "day", "[]")
     );
-  
+
     const checkInReservations = reservationsForDay.filter((res) =>
       moment(day).isSame(moment(res.start_date), "day")
     );
     const checkOutReservations = reservationsForDay.filter((res) =>
       moment(day).isSame(moment(res.end_date), "day")
     );
-  
+
     if (checkOutReservations.length > 0) {
       const checkOutReservation = checkOutReservations[0];
       const checkInReservation = checkInReservations[0];
-  
+
       return (
         <div className="split-cell">
-           <ToastContainer />
           <div
             className="half reserved"
             onClick={() =>
@@ -146,8 +138,8 @@ const reloadReservations = async () => {
             title={
               checkInReservation
                 ? `Check-in às ${moment(checkInReservation.start_date).format(
-                    "HH:mm"
-                  )} - ${checkInReservation.guest_name}`
+                  "HH:mm"
+                )} - ${checkInReservation.guest_name}`
                 : "Dia disponível"
             }
           >
@@ -156,7 +148,7 @@ const reloadReservations = async () => {
         </div>
       );
     }
-  
+
     if (reservationsForDay.length > 0) {
       const reservation = reservationsForDay[0];
       const isStartOfReservation = moment(day).isSame(reservation.start_date, "day");
@@ -178,7 +170,7 @@ const reloadReservations = async () => {
         </div>
       );
     }
-  
+
     return (
       <div
         className="available"
@@ -189,7 +181,7 @@ const reloadReservations = async () => {
       </div>
     );
   };
-  
+
   const handleCellClick = (roomId, date, reservation) => {
     if (reservation) {
       // Abre o modal de edição para a reserva selecionada
@@ -201,14 +193,14 @@ const reloadReservations = async () => {
       setShowAddModal(true);
     }
   };
-  
-  
+
+
   const daysOfWeek = generateDaysRange();
   const filteredRooms = rooms.filter((room) => room.location === `${currentPage}`);
 
   return (
     <div className="container reservations-page">
-
+      <ToastContainer />
       {/* Navegação de semana e filtro */}
 
       <div className='d-flex justify-content-center mb-4'><h3>Listagem de Reserva:</h3></div>
@@ -231,77 +223,82 @@ const reloadReservations = async () => {
         </button>
       </div>
       <div className="d-flex justify-content-center mb-4">
-      {[...new Set(rooms.map((room) => room.location))].map((page) => (
-    <button
-      key={page}
-      className={`btn ${
-        currentPage === parseInt(page) ? "btn-primary" : "btn-outline-primary"
-      } mx-2`}
-      onClick={() => setCurrentPage(parseInt(page))}
-    >
-      Página {page}
-    </button>
-  ))}
+        {[...new Set(rooms.map((room) => room.location))].map((page) => (
+          <button
+            key={page}
+            className={`btn ${currentPage === parseInt(page) ? "btn-primary" : "btn-outline-primary"
+              } mx-2`}
+            onClick={() => setCurrentPage(parseInt(page))}
+          >
+            Página {page}
+          </button>
+        ))}
       </div>
 
       <div className="table-responsive">
         <table className="table table-bordered">
-        <thead>
-  <tr>
-    <th className="room-column">Quartos</th>
-    {daysOfWeek.map((day) => (
-      <th key={day.format("YYYY-MM-DD")}>{day.format("ddd DD")}</th>
-    ))}
-  </tr>
-</thead>
-<tbody>
-  {filteredRooms.map((room) => (
-    <tr key={room.id}>
-      <td className="room-column">{room.name}</td>
-      {daysOfWeek.map((day) => (
-        <td key={day.format("YYYY-MM-DD")}>{renderCellContent(room, day)}</td>
-      ))}
-    </tr>
-  ))}
-</tbody>
+          <thead>
+            <tr>
+              <th className="room-column">Quartos</th>
+              {daysOfWeek.map((day) => (
+                <th key={day.format("YYYY-MM-DD")}>{day.format("ddd DD")}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filteredRooms.map((room) => (
+              <tr key={room.id}>
+                <td className="room-column">{room.name}</td>
+                {daysOfWeek.map((day) => (
+                  <td key={day.format("YYYY-MM-DD")}>{renderCellContent(room, day)}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
-
-      {/* Modais */}
       {showAddModal && (
         <AddReservationModal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSubmit={async (newReservation) => {
-          await handleAddReservation(newReservation, reloadReservations);
-          setShowAddModal(false); // Fecha o modal
-        }}
-        selectedRoom={selectedRoom}
-        selectedDate={selectedDate}
-        guests={guests}
-      />
+          isOpen={showAddModal}
+          onClose={() => {
+            setShowAddModal(false);
+            setModalError(null); // Limpa o erro ao fechar o modal
+          }}
+          onSubmit={async (newReservation) => {
+            if (!validateReservation(newReservation)) return; // Validação inicial
+            const result = await handleAddReservation(newReservation, reloadReservations, setModalError);
+            if (result) {
+              setShowAddModal(false); // Fecha o modal somente se a reserva for adicionada com sucesso
+            }
+          }}
+          selectedRoom={selectedRoom}
+          selectedDate={selectedDate}
+          guests={guests}
+          modalError={modalError}
+        />
       )}
+
       {editReservation && (
         <EditReservationModal
-        editReservation={editReservation}
-        setEditReservation={setEditReservation}
-        onClose={async () => {
-          setEditReservation(null);
-          await reloadReservations(); // Garante que as reservas sejam recarregadas ao fechar o modal
-        }}
-        onSubmit={async (updatedReservation) => {
-          await handleUpdateReservation(updatedReservation, reloadReservations, setEditReservation);
-        }}
-        handleDeleteReservation={async (reservationId) => {
-          await handleDeleteReservation(reservationId, reloadReservations, setEditReservation);
-        }}
-        rooms={rooms}
-        guests={guests}
-      />
-
+          editReservation={editReservation}
+          setEditReservation={setEditReservation}
+          onClose={async () => {
+            setEditReservation(null);
+            await reloadReservations(); // Garante que as reservas sejam recarregadas ao fechar o modal
+            setModalError(null); // Limpa o erro ao fechar o modal
+          }}
+          onSubmit={async (updatedReservation) => {
+            await handleUpdateReservation(updatedReservation, reloadReservations, setEditReservation, setModalError);
+          }}
+          handleDeleteReservation={async (reservationId) => {
+            await handleDeleteReservation(reservationId, reloadReservations, setEditReservation);
+          }}
+          rooms={rooms}
+          guests={guests}
+          modalError={modalError}
+        />
       )}
     </div>
   );
 };
-
 export default ReservationsPage;

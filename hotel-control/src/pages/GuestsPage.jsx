@@ -8,6 +8,7 @@ import api from '../services/api';
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const GuestsPage = () => {
+  const [modalError, setModalError] = useState(null); // Estado para armazenar erros no modal
   const [editGuest, setEditGuest] = useState(null); // Estado para o hóspede sendo editado
   const [isLoading, setIsLoading] = useState(true); // Estado de carregamento
   const [guests, setGuests] = useState([]); // Estado para a lista de hóspedes
@@ -45,12 +46,12 @@ const GuestsPage = () => {
     try {
       await api.delete(`/guests/${id}`);
       toast.success('Hóspede excluído com sucesso!');
-  
+
       // Atualiza a lista de hóspedes após a exclusão
       fetchGuests('', setGuests, setIsLoading);
     } catch (error) {
       console.error('Erro ao excluir hóspede:', error);
-  
+
       if (error.response && error.response.data.error.includes('foreign key constraint')) {
         toast.error('Não é possível excluir o hóspede porque ele possui reservas associadas.');
       } else {
@@ -58,19 +59,19 @@ const GuestsPage = () => {
       }
     }
   };
-  
+
 
   const handleUpdateGuest = async (updatedGuest) => {
     try {
       await api.put(`/guests/${updatedGuest.id}`, updatedGuest);
       toast.success('Hóspede atualizado com sucesso!');
-  
+
       // Atualiza a lista de hóspedes
       fetchGuests('', setGuests, setIsLoading);
-  
+
       // Reseta o estado do hóspede em edição
       setEditGuest(null);
-  
+
       // Fecha o modal
       const modalElement = document.getElementById('editGuestModal');
       if (modalElement) {
@@ -97,7 +98,7 @@ const GuestsPage = () => {
         cep: guest.cep || "",
       },
     });
-  
+
     setTimeout(() => {
       const modalElement = document.getElementById("editGuestModal");
       if (modalElement) {
@@ -164,44 +165,44 @@ const GuestsPage = () => {
       </section>
 
       {/* Lista de Hóspedes */}
-<section className="guests-list">
-  <ul className="list-group">
-    {guests.map((guest) => (
-      <li key={guest.id} className="list-group-item mb-2">
-        {/* Nome do Hóspede */}
-        <div>
-          <strong>{guest.name}</strong>
-        </div>
+      <section className="guests-list">
+        <ul className="list-group">
+          {guests.map((guest) => (
+            <li key={guest.id} className="list-group-item mb-2">
+              {/* Nome do Hóspede */}
+              <div>
+                <strong>{guest.name}</strong>
+              </div>
 
-        {/* CPF ou CNPJ */}
-        <div>
-          <span className="fw-bold">
-            {guest.type === "1" ? "CNPJ:" : "CPF:"}
-          </span>{" "}
-          {guest.cpf_cnpj || "Não informado"}
-        </div>
+              {/* CPF ou CNPJ */}
+              <div>
+                <span className="fw-bold">
+                  {guest.type === "1" ? "CNPJ:" : "CPF:"}
+                </span>{" "}
+                {guest.cpf_cnpj || "Não informado"}
+              </div>
 
-        {/* Endereço */}
-        <div>
-          <span className="fw-bold">Endereço:</span>{" "}
-          {guest.cidade
-            ? `${guest.estado || "Estado não informado"}, ${guest.cidade || "Cidade não informada"}, ${guest.bairro || "Bairro não informado"}, ${guest.rua || "Rua não informada"}, ${guest.numero || "Número não informado"}, ${guest.cep || "CEP não informado"}`
-            : "Endereço não informado"}
-        </div>
+              {/* Endereço */}
+              <div>
+                <span className="fw-bold">Endereço:</span>{" "}
+                {guest.cidade
+                  ? `${guest.estado || "Estado não informado"}, ${guest.cidade || "Cidade não informada"}, ${guest.bairro || "Bairro não informado"}, ${guest.rua || "Rua não informada"}, ${guest.numero || "Número não informado"}, ${guest.cep || "CEP não informado"}`
+                  : "Endereço não informado"}
+              </div>
 
-        {/* Botão de Ação */}
-        <div className="mt-2">
-          <button
-            className="btn btn-sm btn-primary"
-            onClick={() => openEditModal(guest, setEditGuest)}
-          >
-            Editar
-          </button>
-        </div>
-      </li>
-    ))}
-  </ul>
-</section>
+              {/* Botão de Ação */}
+              <div className="mt-2">
+                <button
+                  className="btn btn-sm btn-primary"
+                  onClick={() => openEditModal(guest, setEditGuest)}
+                >
+                  Editar
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       {/* Passo 2: Passando fetchGuests como prop para AddGuestModal */}
       <AddGuestModal
@@ -209,15 +210,17 @@ const GuestsPage = () => {
         setNewGuest={setNewGuest}
         setGuests={setGuests}
         fetchGuests={fetchGuests} // Prop para o modal
+        setModalError={modalError}
       />
 
       {/* Modal de Edição */}
       <EditGuestModal
-  editGuest={editGuest}
-  setEditGuest={setEditGuest}
-  handleUpdateGuest={handleUpdateGuest}
-  handleDeleteGuest={(id) => handleDeleteGuest(id, setGuests, guests)}
-/>
+        editGuest={editGuest}
+        setEditGuest={setEditGuest}
+        handleUpdateGuest={handleUpdateGuest}
+        handleDeleteGuest={(id) => handleDeleteGuest(id, setGuests, guests)}
+        modalError={modalError}
+      />
     </div>
   );
 };

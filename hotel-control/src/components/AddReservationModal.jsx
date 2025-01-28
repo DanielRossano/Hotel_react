@@ -4,7 +4,7 @@ import AsyncSelect from "react-select/async";
 import "../styles/ReservationsPage.css";
 import { handleInputChange, calculateTotalAndDays } from "../services/reservationsFunctions";
 
-const AddReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit }) => {
+const AddReservationModal = ({ isOpen, onClose, onSubmit, selectedRoom, selectedDate, guests, modalError }) => {
   const [useCustomName, setUseCustomName] = useState(false);
   const [customName, setCustomName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,8 +16,8 @@ const AddReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit }) 
     start_date: selectedDate ? `${selectedDate}T13:00` : "",
     end_date: selectedDate
       ? `${new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 1))
-          .toISOString()
-          .split("T")[0]}T12:00`
+        .toISOString()
+        .split("T")[0]}T12:00`
       : "",
     daily_rate: selectedRoom?.preco || "",
     total_amount: "",
@@ -55,8 +55,8 @@ const AddReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit }) 
       start_date: selectedDate ? `${selectedDate}T13:00` : "",
       end_date: selectedDate
         ? `${new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 1))
-            .toISOString()
-            .split("T")[0]}T12:00`
+          .toISOString()
+          .split("T")[0]}T12:00`
         : "",
       daily_rate: selectedRoom?.preco || "",
     }));
@@ -78,7 +78,7 @@ const AddReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit }) 
   if (!selectedRoom || !selectedDate) return null;
 
   return (
-    <div className="modal fade show" tabIndex="-1" style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+    <div className={`modal ${isOpen ? 'show' : ''}`} style={{ display: isOpen ? 'block' : 'none', backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
@@ -86,19 +86,20 @@ const AddReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit }) 
             <button type="button" className="btn-close" onClick={onClose}></button>
           </div>
           <div className="modal-body">
-          <form
-  onSubmit={(e) => {
-    e.preventDefault();
-    if (typeof onSubmit === "function") {
-      onSubmit({
-        ...newReservation,
-        custom_name: useCustomName ? customName : null, // Inclui o customName no envio
-      });
-    } else {
-      console.error("Função onSubmit não definida ou inválida!");
-    }
-  }}
->
+            {modalError && <div className="alert alert-danger">{modalError}</div>}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (typeof onSubmit === "function") {
+                  onSubmit({
+                    ...newReservation,
+                    custom_name: useCustomName ? customName : null,
+                  });
+                } else {
+                  console.error("Função onSubmit não definida ou inválida!");
+                }
+              }}
+            >
               <div className="mb-3">
                 <label htmlFor="searchGuest" className="form-label d-flex align-items-center">
                   Buscar Hóspede
@@ -213,7 +214,7 @@ const AddReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit }) 
               </div>
               <div className="mb-3">
                 <label htmlFor="startDate" className="form-label">
-                  Data de Início: 
+                  Data de Início:
                   <span className="mb-2 text-muted">(Check-in)</span>
                 </label>
                 <input

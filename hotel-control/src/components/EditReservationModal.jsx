@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
 import api from "../services/api";
 import AsyncSelect from "react-select/async";
 import "../styles/ReservationsPage.css";
@@ -17,8 +16,8 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
     start_date: editReservation?.start_date || (selectedDate ? `${selectedDate}T13:00` : ""),
     end_date: editReservation?.end_date || (selectedDate
       ? `${new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 1))
-          .toISOString()
-          .split("T")[0]}T12:00`
+        .toISOString()
+        .split("T")[0]}T12:00`
       : ""),
     daily_rate: editReservation?.daily_rate || selectedRoom?.preco || "",
     total_amount: editReservation?.total_amount || "",
@@ -118,9 +117,9 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                       filteredGuests.find((guest) => guest.value === updatedReservation.guest_id) ||
                       (editReservation?.guest_id
                         ? {
-                            value: editReservation.guest_id,
-                            label: editReservation.guest_name || "Hóspede carregado",
-                          }
+                          value: editReservation.guest_id,
+                          label: editReservation.guest_name || "Hóspede carregado",
+                        }
                         : null)
                     }
                     loadOptions={async (inputValue) => {
@@ -163,17 +162,17 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                     className="flex-grow-1 me-2"
                   />
                   <button
-  type="button"
-  className="btn btn-limpar"
-  onClick={() => {
-    setUpdatedReservation((prev) => ({ ...prev, guest_id: "" }));
-    setFilteredGuests([]);
-    setSearchTerm("");
-    setEditReservation((prev) => ({ ...prev, guest_id: "", guest_name: "" }));
-  }}
->
-  Limpar
-</button>
+                    type="button"
+                    className="btn btn-limpar"
+                    onClick={() => {
+                      setUpdatedReservation((prev) => ({ ...prev, guest_id: "" }));
+                      setFilteredGuests([]);
+                      setSearchTerm("");
+                      setEditReservation((prev) => ({ ...prev, guest_id: "", guest_name: "" }));
+                    }}
+                  >
+                    Limpar
+                  </button>
 
                 </div>
               </div>
@@ -221,7 +220,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
               </div>
               <div className="mb-3">
                 <label htmlFor="startDate" className="form-label">
-                  Data de Início: 
+                  Data de Início:
                   <span className="mb-2 text-muted">(Check-in)</span>
                 </label>
                 <input
@@ -350,7 +349,6 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                         });
                       } catch (error) {
                         console.error("Erro ao excluir reserva:", error);
-                        toast.error("Erro ao excluir reserva.");
                       }
                     }
                   }}
