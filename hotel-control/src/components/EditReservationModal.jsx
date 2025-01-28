@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
 import api from "../services/api";
 import AsyncSelect from "react-select/async";
 import "../styles/ReservationsPage.css";
 import { handleInputChange, calculateTotalAndDays, handleDeleteReservation } from "../services/reservationsFunctions";
 
 const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, editReservation, setEditReservation }) => {
-  const [useCustomName, setUseCustomName] = useState(false);
+  const [useCustomName, setUseCustomName] = useState(!!editReservation?.custom_name);
   const [customName, setCustomName] = useState(editReservation?.custom_name || "");
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredGuests, setFilteredGuests] = useState([]);
@@ -17,8 +16,8 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
     start_date: editReservation?.start_date || (selectedDate ? `${selectedDate}T13:00` : ""),
     end_date: editReservation?.end_date || (selectedDate
       ? `${new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 1))
-          .toISOString()
-          .split("T")[0]}T12:00`
+        .toISOString()
+        .split("T")[0]}T12:00`
       : ""),
     daily_rate: editReservation?.daily_rate || selectedRoom?.preco || "",
     total_amount: editReservation?.total_amount || "",
@@ -62,15 +61,12 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
 
   useEffect(() => {
     if (editReservation?.guest_id && !filteredGuests.length) {
-      setFilteredGuests([
-        {
-          value: editReservation.guest_id,
-          label: editReservation.guest_name || "Hóspede carregado",
-        },
-      ]);
+      setFilteredGuests([{
+        value: editReservation.guest_id,
+        label: editReservation.guest_name || "Hóspede carregado",
+      }]);
     }
   }, [editReservation, filteredGuests.length]);
-  
 
   const { total, days } = calculateTotalAndDays(updatedReservation);
 
@@ -91,7 +87,10 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
               onSubmit={(e) => {
                 e.preventDefault();
                 if (typeof onSubmit === "function") {
-                  onSubmit(updatedReservation);
+                  onSubmit({
+                    ...updatedReservation,
+                    custom_name: useCustomName ? customName : null,
+                  });
                 } else {
                   console.error("Função onSubmit não definida ou inválida!");
                 }
@@ -111,69 +110,72 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   </a>
                 </label>
                 <div className="d-flex align-items-center">
-  <AsyncSelect
-    defaultOptions
-    cacheOptions={false}
-    value={
-      filteredGuests.find((guest) => guest.value === updatedReservation.guest_id) ||
-      (editReservation?.guest_id
-        ? {
-            value: editReservation.guest_id,
-            label: editReservation.guest_name || "Hóspede carregado",
-          }
-        : null)
-    }
-    loadOptions={async (inputValue) => {
-      if (!inputValue) return [];
-      try {
-        const response = await api.get(`/guests`);
-        const normalizedInput = inputValue
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[̀-ͯ]/g, "");
-        const options = response.data
-          .filter((guest) =>
-            guest.name
-              .toLowerCase()
-              .normalize("NFD")
-              .replace(/[̀-ͯ]/g, "")
-              .includes(normalizedInput)
-          )
-          .map((guest) => ({
-            value: guest.id,
-            label: guest.name,
-          }));
-        setFilteredGuests(options);
-        return options;
-      } catch (error) {
-        console.error("Erro ao buscar hóspedes:", error);
-        return [];
-      }
-    }}
-    onChange={(selectedOption) => {
-      if (selectedOption) {
-        setUpdatedReservation((prev) => ({
-          ...prev,
-          guest_id: selectedOption.value,
-        }));
-      }
-    }}
-    placeholder="Digite o nome do hóspede..."
-    noOptionsMessage={() => "Nenhum hóspede encontrado"}
-    className="flex-grow-1 me-2"
-  />
-  <button
-    type="button"
-    className="btn btn-limpar"
-    onClick={() => {
-      setUpdatedReservation((prev) => ({ ...prev, guest_id: "" }));
-      setFilteredGuests([]);
-    }}
-  >
-    Limpar
-  </button>
-</div>
-</div>
+                  <AsyncSelect
+                    defaultOptions
+                    cacheOptions={false}
+                    value={
+                      filteredGuests.find((guest) => guest.value === updatedReservation.guest_id) ||
+                      (editReservation?.guest_id
+                        ? {
+                          value: editReservation.guest_id,
+                          label: editReservation.guest_name || "Hóspede carregado",
+                        }
+                        : null)
+                    }
+                    loadOptions={async (inputValue) => {
+                      if (!inputValue) return [];
+                      try {
+                        const response = await api.get(`/guests`);
+                        const normalizedInput = inputValue
+                          .toLowerCase()
+                          .normalize("NFD")
+                          .replace(/[̀-ͯ]/g, "");
+                        const options = response.data
+                          .filter((guest) =>
+                            guest.name
+                              .toLowerCase()
+                              .normalize("NFD")
+                              .replace(/[̀-ͯ]/g, "")
+                              .includes(normalizedInput)
+                          )
+                          .map((guest) => ({
+                            value: guest.id,
+                            label: guest.name,
+                          }));
+                        setFilteredGuests(options);
+                        return options;
+                      } catch (error) {
+                        console.error("Erro ao buscar hóspedes:", error);
+                        return [];
+                      }
+                    }}
+                    onChange={(selectedOption) => {
+                      if (selectedOption) {
+                        setUpdatedReservation((prev) => ({
+                          ...prev,
+                          guest_id: selectedOption.value,
+                        }));
+                      }
+                    }}
+                    placeholder="Digite o nome do hóspede..."
+                    noOptionsMessage={() => "Nenhum hóspede encontrado"}
+                    className="flex-grow-1 me-2"
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-limpar"
+                    onClick={() => {
+                      setUpdatedReservation((prev) => ({ ...prev, guest_id: "" }));
+                      setFilteredGuests([]);
+                      setSearchTerm("");
+                      setEditReservation((prev) => ({ ...prev, guest_id: "", guest_name: "" }));
+                    }}
+                  >
+                    Limpar
+                  </button>
+
+                </div>
+              </div>
               <hr />
               <div className="form-check">
                 <input
@@ -218,7 +220,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
               </div>
               <div className="mb-3">
                 <label htmlFor="startDate" className="form-label">
-                  Data de Início: 
+                  Data de Início:
                   <span className="mb-2 text-muted">(Check-in)</span>
                 </label>
                 <input
@@ -314,7 +316,6 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   required
                 />
               </div>
-             
               <div className="mb-3">
                 <label htmlFor="total_amount" className="form-label">
                   Valor Total (R$)
@@ -329,42 +330,35 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                 />
               </div>
               <div className="modal-footer">
-  {/* Botão de Voltar */}
-  <button
-    type="button"
-    className="btn btn-secondary"
-    onClick={onClose}
-  >
-    Voltar
-  </button>
-
-  {/* Botão de Excluir */}
-  <button
-  type="button"
-  className="btn btn-danger"
-  onClick={async () => {
-    if (window.confirm("Tem certeza que deseja excluir esta reserva?")) {
-      try {
-        await handleDeleteReservation(editReservation.id, (updatedReservations) => {
-          setEditReservation(null); // Limpa o estado da edição
-          onClose(); // Fecha o modal
-        });
-      } catch (error) {
-        console.error("Erro ao excluir reserva:", error);
-        toast.error("Erro ao excluir reserva.");
-      }
-    }
-  }}
->
-  Excluir Reserva
-</button>
-
-  {/* Botão de Salvar Alterações */}
-  <button type="submit" className="btn btn-primary">
-    Salvar Alterações
-  </button>
-</div>
-
+                <button
+                  type="button"
+                  className="btn btn-limpar"
+                  onClick={onClose}
+                >
+                  Voltar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={async () => {
+                    if (window.confirm("Tem certeza que deseja excluir esta reserva?")) {
+                      try {
+                        await handleDeleteReservation(editReservation.id, (updatedReservations) => {
+                          setEditReservation(null);
+                          onClose();
+                        });
+                      } catch (error) {
+                        console.error("Erro ao excluir reserva:", error);
+                      }
+                    }
+                  }}
+                >
+                  Excluir Reserva
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  Salvar Alterações
+                </button>
+              </div>
             </form>
           </div>
         </div>

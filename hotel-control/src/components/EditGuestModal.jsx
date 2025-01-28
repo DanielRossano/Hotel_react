@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { handleInputChange, handleAddressChange } from "../services/modalGuestsFunctions";
-import { toast } from "react-toastify";
 
 const resetBodyState = () => {
   document.body.classList.remove("modal-open");
@@ -38,12 +37,12 @@ const EditGuestModal = ({ editGuest, setEditGuest, handleUpdateGuest, handleDele
 
     // Valida CPF ou CNPJ
     if (editGuest.type === "fisica" && !/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(editGuest.cpf_cnpj)) {
-      toast.error("Por favor, insira um CPF válido.");
+      console.error("Por favor, insira um CPF válido.");
       return;
     }
 
     if (editGuest.type === "juridica" && !/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(editGuest.cpf_cnpj)) {
-      toast.error("Por favor, insira um CNPJ válido.");
+      console.error("Por favor, insira um CNPJ válido.");
       return;
     }
 
@@ -61,7 +60,6 @@ const EditGuestModal = ({ editGuest, setEditGuest, handleUpdateGuest, handleDele
         }
       } catch (error) {
         console.error("Erro ao excluir hóspede:", error);
-        toast.error("Não foi possível excluir o hóspede.");
       }
     }
   };

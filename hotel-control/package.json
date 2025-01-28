@@ -1,9 +1,13 @@
 {
   "name": "hotel-control",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
   "dependencies": {
-    "@fullcalendar/core": "^6.1.15",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",
     "@fullcalendar/react": "^6.1.15",
@@ -26,15 +30,9 @@
     "react-router-dom": "^6.14.1",
     "react-scripts": "^5.0.1",
     "react-select": "^5.10.0",
-    "react-toastify": "^11.0.2",
+    "react-toastify": "^11.0.3",
     "sweetalert2": "^11.6.13",
     "web-vitals": "^4.2.4"
-  },
-  "scripts": {
-    "start": "react-scripts start --openssl-legacy-provider",
-    "build": "react-scripts build --openssl-legacy-provider",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
