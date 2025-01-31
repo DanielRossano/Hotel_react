@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import AsyncSelect from "react-select/async";
-import "../styles/ReservationsPage.css";
 import { handleInputChange, calculateTotalAndDays, handleDeleteReservation } from "../services/reservationsFunctions";
 
 const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, editReservation, setEditReservation }) => {
@@ -185,6 +184,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   checked={useCustomName}
                   onChange={() => setUseCustomName((prev) => !prev)}
                 />
+                <label htmlFor="useCustomName" className="small-checkbox"></label>
                 <label htmlFor="useCustomName" className="form-check-label">
                   Adicionar nome usual?
                 </label>

@@ -240,9 +240,13 @@ const ReservationsPage = () => {
         <table className="table table-bordered">
           <thead>
             <tr>
-              <th className="room-column">Quartos</th>
-              {daysOfWeek.map((day) => (
-                <th key={day.format("YYYY-MM-DD")}>{day.format("ddd DD")}</th>
+            <th className="room-column">Quartos</th>
+          {daysOfWeek.map((day) => (
+            <th key={day.format('YYYY-MM-DD')}>
+              {day.format('ddd DD')}
+              <span className="">/{day.format('MMM')}</span>
+              <br />
+            </th>
               ))}
             </tr>
           </thead>
