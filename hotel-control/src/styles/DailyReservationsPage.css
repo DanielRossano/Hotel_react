@@ -1,68 +1,51 @@
-/* Variáveis para cores e fonte */
-:root {
-    --primary-color: #004080;
-    --secondary-color: #f8f9fa;
-    --background-color: #f9f9f9;
-    --text-color: #333;
-    --hover-bg-color: #c3f0c3;
-    --reserved-bg-color: #ffd580;
-    --reserved-hover-bg: #ffc107;
-    --available-bg-color: #e8faff;
-    --font-family: Arial, sans-serif;
-}
-
-/* Geral */
-body {
-    font-family: var(--font-family);
-    background-color: var(--background-color);
-    color: var(--text-color);
-    margin: 0;
-    padding: 0;
-}
 
 /* Container principal */
 .daily-container {
     max-width: 100%;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 0.5%;
+    padding: 1%;
+    background-color: var(--background-color);
+    box-shadow: 0 2px 10px var(--box-shadow-color);
     border-radius: 8px;
 }
 
 /* Cabeçalho */
-.daily-title {
-    font-size: 24px;
-    color: var(--primary-color);
-    margin-bottom: 20px;
-    text-align: center;
+.daily-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px #ccc solid;
 }
 
-
-/* Input de data */
-.daily-date-input {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
+.header-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--text-color);
 }
 
-.daily-date-label {
-    margin-right: 10px;
+.filter-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espaço entre os elementos */
+}
+
+#daily-selected-date {
+    padding: 5px;
+    font-size: 16px;
 }
 
 /* Tabela */
 .daily-table {
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 2%;
     width: 100%;
 }
 
-.daily-table th,
-.daily-table td {
-    border: 1px solid #ddd;
+/* HEADER */
+.daily-table th {
     text-align: center;
-    padding: 5px; /* Reduzido para linhas mais finas */
+    border: 1px solid #004080;
 }
 
 .daily-table th {
@@ -76,14 +59,6 @@ body {
     line-height: 1.2; /* Torna as linhas mais compactas */
 }
 
-/* Limitar largura da coluna de quartos */
-.daily-table th:first-child,
-.daily-table td:first-child {
-    width: 120px; /* Limite para a coluna de quartos */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
 
 /* Células de status */
 .daily-available {
@@ -103,37 +78,12 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: left;
 }
 
 .daily-reserved:hover {
     background-color: var(--reserved-hover-bg);
     cursor: pointer;
-}
-
-/* Modal */
-.modal-dialog {
-    max-width: 600px;
-    margin: 20px auto;
-}
-
-.modal-header {
-    background-color: #fff;
-    border-bottom: 1px solid #ddd;
-    padding: 15px;
-}
-
-.modal-title {
-    font-size: 18px;
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding: 10px;
-}
-
-.modal-footer button {
-    margin-left: 10px;
 }
 
 /* Responsividade */
@@ -154,11 +104,15 @@ body {
 .daily-cell {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: left;
+    align-items: left;
     padding: 5px;
-    border-radius: 4px;
+    border-radius: 8px;
+    border: 0.5px solid #000000;
     transition: background-color 0.3s ease;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
 }
 
 .daily-cell div {
@@ -167,60 +121,65 @@ body {
 
 .daily-date-selector {
     display: flex;
-    justify-content: center;
     align-items: center;
     margin-bottom: 20px;
     gap: 10px;
 }
+
+/* Colunas da tabela */
 .daily-table-columns {
     display: flex;
     justify-content: space-between; /* Distribui as colunas uniformemente */
     gap: 20px; /* Espaçamento entre as colunas */
-  }
-  
-  .daily-column {
+}
+
+.daily-column {
     flex: 1; /* Faz as colunas ocuparem espaços iguais */
     max-width: calc(33.33% - 20px); /* Limita cada coluna a 1/3 do container menos o gap */
     overflow-x: auto; /* Adiciona rolagem horizontal, se necessário */
-  }
-  
-  .daily-table {
+}
+
+/* Estilos adicionais para a tabela */
+.daily-table {
     width: 100%; /* Garante que a tabela ocupe o espaço disponível dentro da coluna */
-    border-collapse: collapse;
-  }
-  
-  .daily-table th,
-  .daily-table td {
-    border: 1px solid #ddd;
+}
+
+.daily-table th,
+.daily-table td {
+    max-width: 300px; 
     text-align: center;
     padding: 5px;
-  }
-  
-  .daily-table th {
-    background-color: var(--primary-color);
-    color: #fff;
-  }
-  
-  .daily-cell {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 5px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .daily-reserved {
+}
+
+/* Borda no tbody */
+.daily-table tbody {
+    border: 1px solid var(--border-color);
+}
+
+
+/* Limitar largura da coluna de quartos */
+.daily-table th:first-child,
+.daily-table td:first-child {
+    width: 20px; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.daily-table tr:hover {
+    background-color: #ffff;
+}
+
+/* Células de status */
+.daily-reserved {
     background-color: var(--reserved-bg-color);
-  }
-  
-  .daily-available {
+}
+
+.daily-available {
     background-color: var(--available-bg-color);
     cursor: pointer;
-  }
-  
-  .daily-available:hover {
+}
+
+.daily-available:hover {
     background-color: var(--hover-bg-color);
-  }
-  
+}

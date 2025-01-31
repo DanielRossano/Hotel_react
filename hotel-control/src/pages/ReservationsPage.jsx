@@ -199,8 +199,9 @@ const ReservationsPage = () => {
   const filteredRooms = rooms.filter((room) => room.location === `${currentPage}`);
 
   return (
-    <div className="container reservations-page">
+    <div className="daily-container">
       <ToastContainer />
+      
       {/* Navegação de semana e filtro */}
 
       <div className='d-flex justify-content-center mb-4'><h3>Listagem de Reserva:</h3></div>

@@ -247,18 +247,21 @@ const DailyReservationsControl = () => {
   return (
     <div className="daily-container">
       <ToastContainer />
-      <div className="daily-date-selector">
-        <label htmlFor="selectedDate">Data:</label>
-        <input
-          type="date"
-          id="daily-selected-date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-        />
-        <button className="btn btn-primary" onClick={handleExportToWord}>
-          Imprmir lista diária
-        </button>
-      </div>
+      <header className="daily-header">
+        <h1 className="header-title">Controle Diário</h1>
+        <div className="filter-container">
+          <label htmlFor="selectedDate">Data:</label>
+          <input
+            type="date"
+            id="daily-selected-date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
+          <button className="btn btn-primary" onClick={handleExportToWord}>
+            Imprimir lista diária
+          </button>
+        </div>
+      </header>
       {renderTableColumns(rooms, selectedDate)}
 
       {showAddModal && (

@@ -1,3 +1,4 @@
+
 /* Sidebar */
 .sidebar {
   position: fixed;
@@ -5,8 +6,8 @@
   left: -250px; /* Começa fora da tela */
   width: 250px;
   height: 100vh;
-  background-color: whitesmoke; /* Cor de fundo da sidebar */
-  color: #3a4b61;
+  background-color: var(--sidebar-bg-color); /* Cor de fundo da sidebar */
+  color: var(--sidebar-text-color);
   padding: 0;
   transition: all 0.3s ease;
   z-index: 1050;
@@ -18,8 +19,8 @@
 
 /* Header dentro da Sidebar */
 .sidebar-header {
-  background-color: #004080;
-  color: white;
+  background-color: var(--sidebar-header-bg-color);
+  color: var(--sidebar-header-text-color);
   padding: 15px 20px;
   display: flex;
   justify-content: space-between;
@@ -37,7 +38,7 @@
   border: none;
   font-size: 20px;
   cursor: pointer;
-  color: white;
+  color: var(--sidebar-header-text-color);
 }
 
 /* Links na navegação */
@@ -52,32 +53,7 @@
 }
 
 .sidebar nav a {
-  color: #2d3e50;
-  text-decoration: none;
-  padding: 10px 20px;
-  display: block;
-  font-size: 16px;
-}
-
-.sidebar nav a:hover {
-  background-color: lightgray; /* Destaque ao passar o mouse */
-}
-
-/* Overlay */
-.sidebar-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1049;
-}
-
-
-/* Ícones nos links */
-.sidebar nav a {
-  color: #2d3e50;
+  color: var(--sidebar-link-color);
   text-decoration: none;
   padding: 10px 20px;
   display: flex; /* Flexbox para alinhar ícone e texto */
@@ -89,14 +65,25 @@
 
 .sidebar nav a i {
   font-size: 18px; /* Tamanho dos ícones */
-  color: #004080; /* Cor do ícone */
+  color: var(--sidebar-icon-color); /* Cor do ícone */
 }
 
 .sidebar nav a:hover {
-  background-color: lightgray; /* Destaque ao passar o mouse */
-  color: #004080; /* Cor do texto ao passar o mouse */
+  background-color: var(--sidebar-link-hover-bg-color); /* Destaque ao passar o mouse */
+  color: var(--sidebar-link-hover-text-color); /* Cor do texto ao passar o mouse */
 }
 
 .sidebar nav a:hover i {
-  color: #0066cc; /* Cor do ícone ao passar o mouse */
+  color: var(--sidebar-icon-hover-color); /* Cor do ícone ao passar o mouse */
+}
+
+/* Overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--overlay-bg-color);
+  z-index: 1049;
 }

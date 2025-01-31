@@ -57,8 +57,6 @@ button.btn-light:hover {
   }
 }
 
-
-
 button.btn-primary {
   font-size: 14px;
   padding: 8px 15px;
@@ -109,13 +107,6 @@ button.btn-primary {
   cursor: pointer;
   border: none;
 }
-
-.list-group-item .btn-edit {
-  background-color: #0099c6; /* Edit Buttons */
-  color: white;
-}
-
-
 
 .list-group-item .btn-danger {
   background-color: #d33; /* Cancel Buttons */
@@ -192,9 +183,14 @@ body {
   padding: 0;
 }
 
+.list-group-item .btn-edit {
+  background-color: #ddd; /* Edit Buttons */
+  color: #000000;
+}
+
 .list-group-item .btn-edit:hover {
-  background-color: #007896;
-  color: white;
+  background-color: #ccc;
+  color: rgb(0, 0, 0);
 }
 
 .form-control.search-input {
@@ -215,3 +211,34 @@ body {
   color: #999; /* Cor do placeholder */
 }
 
+.guests-list {
+  width: 100%;
+}
+
+.guest-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 15px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s ease;
+}
+
+.guest-item:hover {
+  background-color: #e9ecef;
+}
+
+.guest-info {
+  width: 100%;
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.guest-info:last-child {
+  border-bottom: none;
+}
+
+.guest-actions {
+  margin-top: 10px;
+}
