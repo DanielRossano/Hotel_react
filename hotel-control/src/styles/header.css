@@ -1,9 +1,9 @@
+
 /* Header */
 .header {
-  height: 60px;
-  background-color: #004080;
-  color: #ffffff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: 50px;
+  background-color: var(--primary-color); /* Cor de fundo do header */
+  box-shadow: 0 4px 6px var(--box-shadow-color);
   display: flex;
   justify-content: center; /* Centraliza horizontalmente */
   align-items: center; /* Centraliza verticalmente */
@@ -28,7 +28,7 @@
   display: block;
   width: 30px;
   height: 3px;
-  background-color: white;
+  background-color: #ffffff;
   border-radius: 2px;
 }
 
@@ -36,13 +36,13 @@
   margin-bottom: 5px;
 }
 
-/* Estilo para h1 centralizado */
+
 .header h1 {
-  font-family: 'Arial', sans-serif; /* Fonte alterada */
-  font-size: 24px; /* Tamanho da fonte */
+  font-family: "Inter", sans-serif; /* Fonte alterada */
+  font-size: 20px; /* Tamanho da fonte */
   font-weight: bold; /* Peso da fonte */
   margin: 0;
-  color: #ffffff;
+  color: #ffffff; /* Cor do texto */
   text-align: center; /* Centraliza o texto horizontalmente */
   width: 100%; /* Garante que o h1 ocupe toda a largura do header */
 }

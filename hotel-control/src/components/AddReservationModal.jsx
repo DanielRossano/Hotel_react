@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import AsyncSelect from "react-select/async";
-import "../styles/ReservationsPage.css";
 import { handleInputChange, calculateTotalAndDays } from "../services/reservationsFunctions";
 
 const AddReservationModal = ({ isOpen, onClose, onSubmit, selectedRoom, selectedDate, guests, modalError }) => {

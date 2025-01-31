@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { handleInputChange, handleAddressChange } from "../services/modalGuestsFunctions";
 
@@ -9,6 +9,8 @@ const resetBodyState = () => {
 };
 
 const EditGuestModal = ({ editGuest, setEditGuest, handleUpdateGuest, handleDeleteGuest }) => {
+  const [showAddress, setShowAddress] = useState(false); // Estado para controlar a visibilidade do endereço
+
   useEffect(() => {
     const modalElement = document.getElementById("editGuestModal");
 
@@ -76,7 +78,7 @@ const EditGuestModal = ({ editGuest, setEditGuest, handleUpdateGuest, handleDele
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title" id="editGuestModalLabel">
-              Editar Hóspede
+              Editar Hóspede:
             </h5>
             <button
               type="button"
@@ -90,7 +92,7 @@ const EditGuestModal = ({ editGuest, setEditGuest, handleUpdateGuest, handleDele
               {/* Nome */}
               <div className="mb-3 row">
                 <label htmlFor="editGuestName" className="col-sm-3 col-form-label">
-                  Nome
+                  Nome:
                 </label>
                 <div className="col-sm-9">
                   <input
@@ -99,6 +101,32 @@ const EditGuestModal = ({ editGuest, setEditGuest, handleUpdateGuest, handleDele
                     className="form-control"
                     value={editGuest.name || ""}
                     onChange={(e) => setEditGuest({ ...editGuest, name: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Telefone */}
+              <div className="mb-3 row">
+                <label htmlFor="editGuestTelefone" className="col-sm-3 col-form-label">
+                  Telefone:
+                </label>
+                <div className="col-sm-9">
+                  <input
+                    id="editGuestTelefone"
+                    type="text"
+                    className="form-control"
+                    placeholder="Telefone"
+                    value={editGuest.telefone || ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        e.target.value,
+                        "(99) 99999-9999",
+                        "telefone",
+                        editGuest,
+                        setEditGuest
+                      )
+                    }
                     required
                   />
                 </div>
@@ -130,26 +158,43 @@ const EditGuestModal = ({ editGuest, setEditGuest, handleUpdateGuest, handleDele
                 </div>
               </div>
 
-              {/* Campos de Endereço */}
-              {["estado", "cidade", "bairro", "rua", "numero", "cep"].map((field) => (
-                <div key={field} className="mb-3 row">
-                  <label
-                    htmlFor={`editGuest${field}`}
-                    className="col-sm-3 col-form-label"
+              {/* Botão para mostrar/esconder endereço */}
+              <div className="mb-3 row">
+                <div className="col-sm-12">
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline-secondary"
+                    onClick={() => setShowAddress(!showAddress)}
                   >
-                    {field[0].toUpperCase() + field.slice(1)}
-                  </label>
-                  <div className="col-sm-9">
-                    <input
-                      id={`editGuest${field}`}
-                      type="text"
-                      className="form-control"
-                      value={editGuest.address[field] || ""}
-                      onChange={(e) => handleAddressChange(e.target.value, field, setEditGuest)}
-                    />
-                  </div>
+                    {showAddress ? "Esconder Endereço" : "Mostrar Endereço"}
+                  </button>
                 </div>
-              ))}
+              </div>
+
+              {/* Campos de Endereço */}
+              {showAddress && (
+                <>
+                  {["estado", "cidade", "bairro", "rua", "numero", "cep"].map((field) => (
+                    <div key={field} className="mb-3 row">
+                      <label
+                        htmlFor={`editGuest${field}`}
+                        className="col-sm-3 col-form-label"
+                      >
+                        {field[0].toUpperCase() + field.slice(1)}:
+                      </label>
+                      <div className="col-sm-9">
+                        <input
+                          id={`editGuest${field}`}
+                          type="text"
+                          className="form-control"
+                          value={editGuest.address[field] || ""}
+                          onChange={(e) => handleAddressChange(e.target.value, field, setEditGuest)}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">

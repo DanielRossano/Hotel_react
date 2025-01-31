@@ -31,6 +31,7 @@ router.post('/', async (req, res) => {
   const {
     name,
     cpf_cnpj,
+    telefone,
     type,
     address: { estado, cidade, bairro, rua, numero, cep } = {},
     nome_fantasia,
@@ -49,12 +50,13 @@ router.post('/', async (req, res) => {
   try {
     const [result] = await db.query(
       `
-      INSERT INTO guests (name, cpf_cnpj, estado, cidade, bairro, rua, numero, cep, nome_fantasia, type) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO guests (name, cpf_cnpj, telefone, estado, cidade, bairro, rua, numero, cep, nome_fantasia, type) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
       [
         name,
         cpf_cnpj,
+        telefone || null,
         estado || null,
         cidade || null,
         bairro || null,
@@ -70,6 +72,7 @@ router.post('/', async (req, res) => {
       id: result.insertId,
       name,
       cpf_cnpj,
+      telefone,
       estado,
       cidade,
       bairro,
@@ -92,6 +95,7 @@ router.put('/:id', async (req, res) => {
   const {
     name,
     cpf_cnpj,
+    telefone,
     estado,
     cidade,
     bairro,
@@ -111,8 +115,9 @@ router.put('/:id', async (req, res) => {
       `
       UPDATE guests 
       SET 
-        name = ?, 
-        cpf_cnpj = ?, 
+        name = ?,
+        cpf_cnpj = ?,
+        telefone = ?,  
         estado = ?, 
         cidade = ?, 
         bairro = ?, 
@@ -126,6 +131,7 @@ router.put('/:id', async (req, res) => {
       [
         name,
         cpf_cnpj,
+        telefone || null,
         estado,
         cidade,
         bairro,

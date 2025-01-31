@@ -15,6 +15,7 @@ const GuestsPage = () => {
   const [search, setSearch] = useState(''); // Filtro de pesquisa
   const [newGuest, setNewGuest] = useState({
     name: '',
+    telefone: '',
     cpf_cnpj: '',
     type: 'fisica', // Valor padrão
     address: {

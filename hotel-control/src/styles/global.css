@@ -1,10 +1,53 @@
+:root {
+  --sidebar-bg-color: whitesmoke;
+  --sidebar-text-color: #3a4b61;
+  --sidebar-header-bg-color: #004080;
+  --sidebar-header-text-color: white;
+  --sidebar-link-color: #2d3e50;
+  --sidebar-link-hover-bg-color: lightgray;
+  --sidebar-link-hover-text-color: #004080;
+  --sidebar-icon-color: #004080;
+  --sidebar-icon-hover-color: #0066cc;
+  --overlay-bg-color: rgba(0, 0, 0, 0.5);
+  --background-color: #fff;
+  --box-shadow-color: rgba(0, 0, 0, 0.1);
+  --border-color: #ccc;
+  --color-border: #ccc;
+  --text-color: #000;
+  --primary-color: #004080; /* Cor primária */
+  --secundary-color: #007bff; /* Cor secundária */
+  --secundary-color-hover: #0056b3; /* Cor secundária hover */
+  --available-bg-color: #C1DFF0; /* Cor de disponibilidade */
+  --hover-bg-color: #c3e6cb; /* Cor de hover */
+  --reserved-bg-color: #f8c889; /* Cor de reservado */
+  --reserved-hover-bg: #E0A458; /* Cor de hover reservado */
+  --color-save-button: #0ab913; /* Cor do botão de salvar */
+  --color-cancel-button: #ec0b0b;
+  --color-list-border: #000000;
+  --color-save-hover: #24922a;
+  --color-cancel-hover: #cc0000;
+  --color-placeholder: #999;
+}
+
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Inter", sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: #f5f5f5
+    background-color: #f3f3f3
   }
-  h1 {
-    color: #4f4f4f;
+  
+label {
+    font-weight: bold;
+    margin-right: 10px
+  }
+
+  .header-page-h1 {
+    font-size: 1em;
+    color: var(--sidebar-header-text-color);
+    background-color: var(--sidebar-header-bg-color);
+    padding: 10px;
+    margin: 0;
+    align-self: start;
   }
