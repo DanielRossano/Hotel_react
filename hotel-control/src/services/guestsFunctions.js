@@ -32,7 +32,7 @@ export const handleAddGuest = async (newGuest, setGuests, setNewGuest, fetchGues
     setNewGuest({
       name: '',
       cpf_cnpj: '',
-      type: newGuest.type === 0 ? 'fisica' : 'juridica', // Corrigido
+      type: newGuest.type === 0 ? 'fisica' : 'juridica', 
       estado: '',
       cidade: '',
       bairro: '',

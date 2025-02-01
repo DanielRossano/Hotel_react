@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
+import "../styles/checkbox.css";
 import AsyncSelect from "react-select/async";
 import { handleInputChange, calculateTotalAndDays, handleDeleteReservation } from "../services/reservationsFunctions";
 
@@ -162,7 +163,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   />
                   <button
                     type="button"
-                    className="btn btn-limpar"
+                    className="btn btn-outline-secondary"
                     onClick={() => {
                       setUpdatedReservation((prev) => ({ ...prev, guest_id: "" }));
                       setFilteredGuests([]);
@@ -199,7 +200,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                     id="customName"
                     className="form-control"
                     placeholder="Digite o nome usual"
-                    value={customName}
+                    value={customName.toUpperCase()}
                     onChange={(e) => setCustomName(e.target.value)}
                   />
                   <hr />
@@ -207,7 +208,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
               )}
               <div className="mb-3">
                 <label htmlFor="room_id" className="form-label">
-                  Quarto
+                  Quarto:
                 </label>
                 <input
                   type="number"
@@ -332,7 +333,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
               <div className="modal-footer">
                 <button
                   type="button"
-                  className="btn btn-limpar"
+                  className="btn btn-secundary"
                   onClick={onClose}
                 >
                   Voltar
@@ -355,7 +356,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                 >
                   Excluir Reserva
                 </button>
-                <button type="submit" className="btn btn-primary">
+                <button type="submit" className="btn btn-sucess">
                   Salvar Alterações
                 </button>
               </div>

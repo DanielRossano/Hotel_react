@@ -3,6 +3,7 @@ import EditGuestModal from '../components/EditGuestModal';
 import AddGuestModal from '../components/AddGuestModal';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import'../styles/container.css';
 import '../styles/guests-page.css';
 import api from '../services/api';
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -114,7 +115,7 @@ const GuestsPage = () => {
   }, []);
 
   return (
-    <div className="guests-page container">
+    <div className="container">
       <h1 className="text-center my-4">Lista de Hóspedes</h1>
 
       <ToastContainer />

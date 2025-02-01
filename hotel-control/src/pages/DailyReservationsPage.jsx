@@ -14,6 +14,8 @@ import "../styles/cells.css";
 import "../styles/table.css";
 
 const DailyReservationsControl = () => {
+  const [startDate, setStartDate] = useState(moment().startOf("day")); // Dia atual
+  const [endDate, setEndDate] = useState(moment().add(0, "days").endOf("day")); // Dois dias à frente
   const [modalError, setModalError] = useState(null); // Estado para armazenar erros no modal
   const [rooms, setRooms] = useState([]);
   const [reservations, setReservations] = useState([]);
@@ -81,12 +83,12 @@ const DailyReservationsControl = () => {
         {columns.map((column, colIndex) => (
           <div key={colIndex} className="daily-column">
             <table className="daily-table">
-              <thead>
-                <tr>
-                  <th>Quarto</th>
-                  <th>Detalhes</th>
-                </tr>
-              </thead>
+            <thead>
+            <tr>
+            <th className="room-column">Quartos</th>
+            <th className="room-column">Status</th>
+            </tr>
+          </thead>
               <tbody>
                 {column.map((room) => (
                   <tr key={room.id}>
@@ -244,11 +246,78 @@ const DailyReservationsControl = () => {
     saveAs(blob, `Controle_Diario_${selectedDate}.docx`);
   };
 
+
+  const generateDaysRange = () => {
+    const days = [];
+    let day = startDate.clone();
+    while (day <= endDate) {
+      days.push(day.clone());
+      day.add(1, "day");
+    }
+    return days;
+  };
+  
+  const renderNextDayStatus = (room, currentDay) => {
+    const nextDay = moment(currentDay).add(1, "day"); // Dia seguinte
+    const reservationsForNextDay = filteredReservations.filter(
+      (res) =>
+        res.room_id === room.id &&
+        moment(nextDay).isBetween(res.start_date, res.end_date, "day", "[]")
+    );
+  
+    if (reservationsForNextDay.length > 0) {
+      const reservation = reservationsForNextDay[0];
+  
+      // Verifica se é um novo check-in no dia seguinte
+      if (moment(nextDay).isSame(reservation.start_date, "day")) {
+        return (
+          <div className="daily-cell daily-next-day-checkin">
+            Novo Check-in
+          </div>
+        );
+      }
+  
+      // Verifica se é um check-out no dia seguinte
+      if (moment(nextDay).isSame(reservation.end_date, "day")) {
+        return (
+          <div className="daily-cell daily-next-day-checkout">
+            Check-out
+          </div>
+        );
+      }
+  
+      // Se não for nem check-in nem check-out, é continuidade
+      return (
+        <div className="daily-cell daily-next-day-continue">
+          Continua
+        </div>
+      );
+    }
+  
+    // Se não houver reserva no dia seguinte
+    return (
+      <div className="daily-cell daily-next-day-available">
+        Livre
+      </div>
+    );
+  };
+
+  const daysOfWeek = generateDaysRange();
+
   return (
     <div className="daily-container">
       <ToastContainer />
       <header className="daily-header">
         <h1 className="header-title">Controle Diário</h1>
+        <div className="date-range">
+        {daysOfWeek.map((day) => (
+            <h1 key={day.format('YYYY-MM-DD')}>
+              {day.format('ddd DD')}
+              <span className="">/{day.format('MMM')}</span>
+              <br />
+            </h1>
+              ))}
+        </div>
         <div className="filter-container">
           <label htmlFor="selectedDate">Data:</label>
           <input

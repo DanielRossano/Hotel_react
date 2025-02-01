@@ -139,7 +139,7 @@ router.put('/:id', async (req, res) => {
         numero,
         cep,
         nome_fantasia || null,
-        type === "fisica" ? 0 : 1, // Converter para booleano
+        type === '0' ? 0 : 1, // Converter para booleano
         id,
       ]
     );

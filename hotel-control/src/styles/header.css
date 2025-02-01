@@ -1,16 +1,24 @@
-
-/* Header */
 .header {
   height: 50px;
-  background-color: var(--primary-color); /* Cor de fundo do header */
+  background-color: var(--primary-color);
   box-shadow: 0 4px 6px var(--box-shadow-color);
   display: flex;
-  justify-content: center; /* Centraliza horizontalmente */
-  align-items: center; /* Centraliza verticalmente */
-  position: relative; /* Necessário para ajustar o botão de hambúrguer */
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-bottom: 1px solid #000000;
 }
 
-/* Botão de hambúrguer */
+.header h1 {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+  color: #ffffff;
+  text-align: center;
+  width: 100%;
+}
+
 .hamburger-btn {
   display: flex;
   flex-direction: column;
@@ -18,12 +26,11 @@
   width: 30px;
   height: 24px;
   cursor: pointer;
-  padding: 0; /* Para posicionar o botão no lado esquerdo */
+  padding: 0;
   left: 20px;
   position: absolute;
 }
 
-/* Ícone do botão de hambúrguer */
 .hamburger-icon span {
   display: block;
   width: 30px;
@@ -34,15 +41,4 @@
 
 .hamburger-icon span:not(:last-child) {
   margin-bottom: 5px;
-}
-
-
-.header h1 {
-  font-family: "Inter", sans-serif; /* Fonte alterada */
-  font-size: 20px; /* Tamanho da fonte */
-  font-weight: bold; /* Peso da fonte */
-  margin: 0;
-  color: #ffffff; /* Cor do texto */
-  text-align: center; /* Centraliza o texto horizontalmente */
-  width: 100%; /* Garante que o h1 ocupe toda a largura do header */
 }

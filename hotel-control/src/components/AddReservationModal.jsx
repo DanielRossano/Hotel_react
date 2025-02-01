@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
+import "../styles/checkbox.css";
 import AsyncSelect from "react-select/async";
 import { handleInputChange, calculateTotalAndDays } from "../services/reservationsFunctions";
 
@@ -158,7 +159,7 @@ const AddReservationModal = ({ isOpen, onClose, onSubmit, selectedRoom, selected
                   />
                   <button
                     type="button"
-                    className="btn btn-limpar"
+                    className="btn btn-outline-secondary"
                     onClick={() => {
                       setNewReservation((prev) => ({ ...prev, guest_id: "" }));
                       setFilteredGuests([]);
@@ -192,7 +193,7 @@ const AddReservationModal = ({ isOpen, onClose, onSubmit, selectedRoom, selected
                     id="customName"
                     className="form-control"
                     placeholder="Digite o nome usual"
-                    value={customName}
+                    value={customName.toUpperCase()}
                     onChange={(e) => setCustomName(e.target.value)}
                   />
                   <hr />
@@ -200,7 +201,7 @@ const AddReservationModal = ({ isOpen, onClose, onSubmit, selectedRoom, selected
               )}
               <div className="mb-3">
                 <label htmlFor="room_id" className="form-label">
-                  Quarto
+                  Quarto:
                 </label>
                 <input
                   type="number"
@@ -323,10 +324,10 @@ const AddReservationModal = ({ isOpen, onClose, onSubmit, selectedRoom, selected
                 />
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={onClose}>
+                <button type="button" className="btn btn-danger" onClick={onClose}>
                   Cancelar
                 </button>
-                <button type="submit" className="btn btn-primary">
+                <button type="submit" className="btn btn-sucess">
                   Cadastrar
                 </button>
               </div>

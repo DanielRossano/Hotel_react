@@ -1,34 +1,32 @@
-
 .table {
-    border-collapse: collapse; /* Garante que as bordas não sejam duplicadas */
-    table-layout: fixed;
-    width: 100%;
-  }
-  
-  .table th {
-    background-color: #004080;
-    color: #ffffff;
-    text-align: center;
-    padding: 8px;
-    font-weight: bold;
-    border: none; /* Remove bordas duplicadas nas colunas */
-  }
-  
-  .table td {
-    position: relative;
-    padding: 0; /* Remove padding para alinhar o conteúdo */
-    text-align: center;
-    font-size: 12px;
-    height: 25px; /* Altura consistente para células */
-    border: none; /* Remove bordas duplicadas nas células */
-  }
-  
-  /* Estilo para a coluna dos quartos */
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.table th {
+  background-color: #004080;
+  color: #ffffff;
+  text-align: center;
+  padding: 8px;
+  font-weight: bold;
+  border: none;
+}
+
+.table td {
+  position: relative;
+  padding: 0;
+  text-align: center;
+  font-size: 12px;
+  height: 25px;
+  border: none;
+}
+
 .table th.room-column,
 .table td.room-column {
-  width: 150px; /* Define a largura fixa */
-  max-width: 150px; /* Impede que a coluna ultrapasse o limite */
-  text-overflow: ellipsis; /* Adiciona "..." se o conteúdo ultrapassar o limite */
-  white-space: nowrap; /* Evita quebra de linha */
-  overflow: hidden; /* Esconde o conteúdo excedente */
+  width: 150px;
+  max-width: 150px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }

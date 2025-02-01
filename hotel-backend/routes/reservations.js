@@ -94,6 +94,21 @@ router.put('/:id', async (req, res) => {
     const formattedStartDate = moment(start_date).format('YYYY-MM-DD HH:mm:ss');
     const formattedEndDate = moment(end_date).format('YYYY-MM-DD HH:mm:ss');
 
+    const [conflictingReservations] = await db.query(`
+      SELECT * FROM reservations 
+      WHERE room_id = ? 
+      AND id != ?
+      AND (
+        (start_date <= ? AND end_date >= ?) OR 
+        (start_date <= ? AND end_date >= ?) OR 
+        (start_date >= ? AND end_date <= ?)
+      )
+    `, [room_id, id, formattedEndDate, formattedStartDate, formattedStartDate, formattedEndDate, formattedStartDate, formattedEndDate]);
+
+    if (conflictingReservations.length > 0) {
+      return res.status(400).json({ error: 'O quarto já está reservado para o período selecionado.' });
+    }
+
     const start = moment(formattedStartDate).startOf('day');
     const end = moment(formattedEndDate).startOf('day');
     const days = end.diff(start, 'days') + 1;

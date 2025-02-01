@@ -1,168 +1,68 @@
-:root {
-    --color-modal-background: #ffffff;
-    --color-modal-text: #333333;
-    --modal-header-bg-color: #ffffff;
-    --modal-header-border-color: #000000;
-    --modal-footer-bg-color: #ffffff;
-    --modal-footer-border-color: #000000;
-    --modal-footer-secondary-bg-color: #6c757d;
-    --modal-footer-secondary-text-color: #fff;
-    --modal-footer-primary-bg-color: #004080;
-    --modal-footer-primary-text-color: #fff;
-}
-
 .modal-content {
-    background-color: var(--color-modal-background);
-    padding: 20px;
-    border-radius: 10px;
-    width: 500px;
-  }
-  
-  .modal-content h5 {
-    font-size: 18px;
-    color: var(--color-modal-text);
-  }
-  .modal-content form label {
-    font-size: 14px;
-    color: var(--color-modal-text);
-  }
-  
-  .modal-content form input,
-  .modal-content form select {
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    width: 100%;
-  }
-
-  .modal-content form button {
-    font-size: 14px;
-    padding: 8px 15px;
-    border-radius: 5px;
-    border: 1px solid var(--border-color);
-    cursor: pointer;
-  }
-
-  .modal-content form button.btn-primary {
-    background-color: var(--color-save-button);
-    color: white;
-  }
-  
-  .modal-content form button.btn-primary:hover {
-    background-color: var(--color-save-hover);
-  }
-  
-  .modal-content form button.btn-secondary {
-    background-color: var(--color-cancel-button);
-    color: white;
-  }
-  
-  .modal-content form button.btn-secondary:hover {
-    background-color: var(--color-cancel-hover);
-  }
-
-  
-.modal-dialog {
-    max-width: 600px;
-    margin: 20px auto;
-  }
-  
-  .modal-header {
-    background-color: var(--modal-header-bg-color);
-    padding: 1%;
-    border-bottom: 1px solid var(--modal-header-border-color);
-    align-items: center;
-  }
-  
-  .modal-title {
-    font-size: 18px;
-  }
-  
-  .modal-footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 15px;
-  }
-  
-  .modal-footer .btn-secondary {
-    background-color: var(--modal-footer-secondary-bg-color);
-    color: var(--modal-footer-secondary-text-color);
-  }
-  
-  .modal-footer .btn-primary {
-    background-color: var(--modal-footer-primary-bg-color);
-    color: var(--modal-footer-primary-text-color);
-  }
-
-  button.btn-limpar {
-    background-color: var(--button-primary); /* Substitua var(--primary-color) pela cor desejada */
-    color: #ffffff; /* Substitua var(--primary-color) pela cor desejada */
-    border: 1px solid var(--color-border); /* Substitua var(--primary-color) pela cor desejada */
-    padding: 8px 12px;
-    border-radius: 4px;
-    transition: all 0.3s ease-in-out;
-  }
-  
-  button.btn-limpar:hover {
-    background-color: #007BFF; /* Substitua var(--primary-color) pela cor desejada */
-    border-color: var(--border-color); /* Substitua var(--primary-color) pela cor desejada */
-    color: #ffffff; /* Substitua var(--primary-color) pela cor desejada */
-  }
-  
-
-  
-.form-check {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  position: relative;
+  background-color: var(--color-modal-background);
+  padding: 2%;
+  border-radius: 10px;
+  width: 500px;
 }
 
-.check-input {
-  display: none;
+.modal-content h5 {
+  font-size: 18px;
+  color: var(--color-modal-text);
 }
 
-.small-checkbox {
-  width: 14px;
-  height: 14px;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-  background-color: var(--checkbox-bg-color);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.check-input:checked + .small-checkbox::after {
-  content: '✔'; /* Desenho de check */
-  color: #000; /* Cor do check */
-  font-size: 12px; /* Tamanho do check */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-}
-
-
-.check-input:disabled + .small-checkbox {
-  background-color: var(--checkbox-disabled-bg-color);
-  border-color: var(--checkbox-disabled-border-color);
-  cursor: not-allowed;
-}
-
-div.form-check > .form-check-label {
+.modal-content form label {
   font-size: 14px;
-  color: var(--label-text-color);
+  color: var(--color-modal-text);
+}
+
+.modal-content form input,
+.modal-content form select {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  width: 100%;
+}
+
+.modal-content form button {
+  font-size: 12px;
+  padding: 4px;
+  border-radius: 5px;
+  border: none;
   cursor: pointer;
 }
 
+.modal-content form button.btn-sucess {
+  padding: 8px 12px;
+}
 
-/* Responsividade para telas menores */
-@media (max-width: 768px) {
-  .btn-adress {
-      font-size: 14px; /* Reduz o tamanho do texto */
-      padding: 8px 12px;
-  }
+.modal-content form button.btn-secundary {
+  padding: 8px 12px;
+}
+
+.modal-content form button.btn-danger {
+  padding: 8px 12px;
+}
+
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+}
+
+.modal-footer .btn-secondary {
+  background-color: var(--modal-footer-secondary-bg-color);
+  color: var(--modal-footer-secondary-text-color);
+}
+
+.modal-footer .btn-primary {
+  background-color: var(--modal-footer-primary-bg-color);
+  color: var(--modal-footer-primary-text-color);
+}
+
+.modal-div div{
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
 }

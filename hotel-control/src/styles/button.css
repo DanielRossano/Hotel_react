@@ -1,3 +1,4 @@
+/* Estilos do botão primário */
 button.btn-primary {
   font-size: 14px;
   padding: 10px 20px;
@@ -9,78 +10,72 @@ button.btn-primary {
 }
 
 button.btn-primary:hover {
-  background-color:var(--secundary-color-hover); 
+  background-color: var(--secundary-color-hover);
 }
 
+button.btn-outline-primary {
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #fff;
+  color: var(--secundary-color);
+  border: 1px solid var(--secundary-color);
+}
+
+/* Estilos do botão secundario */
+button.btn-secundary {
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background-color: var(--secundary-color);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+button.btn-secundary:hover {
+  background-color: var(--secundary-color-hover);
+  color: #ffffff;
+}
+/* Estilos do botão claro */
 button.btn-light {
   font-size: 14px;
 }
 
 button.btn-light:hover {
-  background-color:var(--secundary-color-hover); 
+  background-color: var(--secundary-color-hover);
+}
+
+/* Estilo do botão buscar */
+button.btn-buscar {
+  background-color: transparent;
+  color: var(--secundary-color);
+  border-radius: 4px;
+  transition: all 0.3s ease-in-out;
+}
+
+button.btn-buscar:hover {
+  color: var(--secundary-color-hover);
+}
+
+/* estilo do botão limpar */
+button.btn-limpar:hover {
+  background-color: var(--secundary-color);
+  border-color: var(--border-color);
+  color: #ffffff;
 }
 
 button.btn-limpar {
-  background-color: var(--secundary-color); 
-  color: #ffffff; 
+  background-color: var(--secundary-color);
+  color: #ffffff;
   border: 2px solid var(--border-color);
   padding: 8px 12px;
   border-radius: 4px;
   transition: all 0.3s ease-in-out;
 }
 
-button.btn-limpar:hover {
-  background-color: var(--secundary-color); /* Substitua var(--primary-color) pela cor desejada */
-  border-color: var(--border-color); /* Substitua var(--primary-color) pela cor desejada */
-  color: #ffffff; /* Substitua var(--primary-color) pela cor desejada */
-}
 
-button.btn-edit {
-  background-color: #F8C889; /* Substitua var(--primary-color) pela cor desejada */
-  color: var(--text-color); /* Substitua var(--primary-color) pela cor desejada */
-  border: 1px solid var(--border-color); /* Substitua var(--primary-color) pela cor desejada */
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: all 0.3s ease-in-out;
-}
-
-/* Estilo para o botão de endereço */
-button.btn-adress {
-  border: 1px solid var(--border-color) !important;
-  color: #007bff; /* Cor do texto */
-  background-color: transparent; /* Fundo transparente */
-  font-size: 16px; /* Tamanho do texto */
-  font-weight: bold; /* Negrito */
-  padding: 10px 15px; /* Espaçamento interno */
-  border-radius: 5px; /* Bordas arredondadas */
-  transition: all 0.3s ease-in-out; /* Transição suave */
-  width: 100%; /* Largura total */
-  text-align: center; /* Centraliza o texto */
-  display: block; /* Garante que ele ocupa toda a largura disponível */
-}
-
-/* Efeito ao passar o mouse */
-.btn-adress:hover {
-  background-color: #007bff; /* Fundo azul */
-  color: white; /* Texto branco */
-}
-
-
-/* Efeito para quando a seção de endereço estiver visível */
-button.btn-adress.active {
-  background-color: #007bff;
-  border-color: 1px solid var(--border-color); /* Borda azul mais escura */
-  color: white;
-}
-
-/* Responsividade para telas menores */
-@media (max-width: 768px) {
-  .btn-adress {
-      font-size: 14px; /* Reduz o tamanho do texto */
-      padding: 8px 12px;
-  }
-}
-
+/* Estilos do botão sucesso */
 button.btn-sucess {
   background-color: var(--color-save-button);
   font-size: 14px;
@@ -93,5 +88,22 @@ button.btn-sucess {
 
 button.btn-sucess:hover {
   background-color: var(--color-save-hover);
+  color: #ffffff;
 }
 
+/* 
+button.btn-outline-primary {
+  background-color: #fff;
+  color: #004080;
+  border: 1px solid #004080;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: all 0.3s ease-in-out;
+}
+
+
+button.btn-outline-primary:hover {
+  background-color: #004080;
+  color: #fff;
+}
+*/

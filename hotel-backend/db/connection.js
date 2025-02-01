@@ -1,5 +1,6 @@
 const mysql = require('mysql2');
 
+//Altere para seus dados de conexão
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
@@ -7,5 +8,4 @@ const pool = mysql.createPool({
   database: 'hotel_control',
 });
 
-// Exportando conexão com suporte a Promises
 module.exports = pool.promise();

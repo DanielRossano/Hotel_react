@@ -1,12 +1,10 @@
-
-/* Sidebar */
 .sidebar {
   position: fixed;
   top: 0;
-  left: -250px; /* Começa fora da tela */
+  left: -250px;
   width: 250px;
   height: 100vh;
-  background-color: var(--sidebar-bg-color); /* Cor de fundo da sidebar */
+  background-color: var(--sidebar-bg-color);
   color: var(--sidebar-text-color);
   padding: 0;
   transition: all 0.3s ease;
@@ -14,10 +12,9 @@
 }
 
 .sidebar.open {
-  left: 0; /* Mostra a sidebar */
+  left: 0;
 }
 
-/* Header dentro da Sidebar */
 .sidebar-header {
   background-color: var(--sidebar-header-bg-color);
   color: var(--sidebar-header-text-color);
@@ -25,7 +22,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra discreta */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .sidebar-header h2 {
@@ -41,7 +38,6 @@
   color: var(--sidebar-header-text-color);
 }
 
-/* Links na navegação */
 .sidebar nav ul {
   list-style: none;
   padding: 0;
@@ -56,28 +52,27 @@
   color: var(--sidebar-link-color);
   text-decoration: none;
   padding: 10px 20px;
-  display: flex; /* Flexbox para alinhar ícone e texto */
+  display: flex;
   align-items: center;
   font-size: 16px;
-  gap: 10px; /* Espaço entre o ícone e o texto */
+  gap: 10px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .sidebar nav a i {
-  font-size: 18px; /* Tamanho dos ícones */
-  color: var(--sidebar-icon-color); /* Cor do ícone */
+  font-size: 18px;
+  color: var(--sidebar-icon-color);
 }
 
 .sidebar nav a:hover {
-  background-color: var(--sidebar-link-hover-bg-color); /* Destaque ao passar o mouse */
-  color: var(--sidebar-link-hover-text-color); /* Cor do texto ao passar o mouse */
+  background-color: var(--sidebar-link-hover-bg-color);
+  color: var(--sidebar-link-hover-text-color);
 }
 
 .sidebar nav a:hover i {
-  color: var(--sidebar-icon-hover-color); /* Cor do ícone ao passar o mouse */
+  color: var(--sidebar-icon-hover-color);
 }
 
-/* Overlay */
 .sidebar-overlay {
   position: fixed;
   top: 0;

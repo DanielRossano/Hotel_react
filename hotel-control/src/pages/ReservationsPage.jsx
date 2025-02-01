@@ -6,9 +6,6 @@ import "react-toastify/dist/ReactToastify.css";
 import AddReservationModal from "../components/AddReservationModal";
 import EditReservationModal from "../components/EditReservationModal";
 import { loadRoomsAndReservations, fetchGuests, handleUpdateReservation, handleDeleteReservation, handleAddReservation, validateReservation } from "../services/reservationsFunctions";
-import "../styles/ReservationsPage.css";
-import "../styles/cells.css";
-import "../styles/table.css";
 
 const ReservationsPage = () => {
   // **Estados Globais**
@@ -202,43 +199,63 @@ const ReservationsPage = () => {
     <div className="daily-container">
       <ToastContainer />
       
-      {/* Navegação de semana e filtro */}
+    {/* Navegação de semana e filtro */}
+<div className="container-fluid bg-light p-4 mb-4 shadow-sm">
+  <div className="row align-items-center">
+    {/* Título */}
+    <div className="col-md-3 text-center text-md-start">
+      <h3 className="mb-0">Reservas</h3>
+    </div>
 
-      <div className='d-flex justify-content-center mb-4'><h3>Listagem de Reserva:</h3></div>
-
-      <div className="d-flex justify-content-center mb-4">
-        <label className="mx-2">De:</label>
-        <input
-          type="date"
-          value={filterStartDate.format("YYYY-MM-DD")}
-          onChange={(e) => setFilterStartDate(moment(e.target.value))}
-        />
-        <label className="mx-2">Até:</label>
-        <input
-          type="date"
-          value={filterEndDate.format("YYYY-MM-DD")}
-          onChange={(e) => setFilterEndDate(moment(e.target.value))}
-        />
-        <button className="btn btn-primary mx-3" onClick={applyFilter}>
+    {/* Filtros de Data */}
+    <div className="col-md-6 text-center">
+      <div className="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3">
+        <div className="d-flex align-items-center">
+        <label className="me-2">Visualizar</label>
+          <label className="me-2">de:</label>
+          <input
+            type="date"
+            className="form-control form-control-sm"
+            value={filterStartDate.format("YYYY-MM-DD")}
+            onChange={(e) => setFilterStartDate(moment(e.target.value))}
+          />
+        </div>
+        <div className="d-flex align-items-center">
+          <label className="me-2">Até:</label>
+          <input
+            type="date"
+            className="form-control form-control-sm"
+            value={filterEndDate.format("YYYY-MM-DD")}
+            onChange={(e) => setFilterEndDate(moment(e.target.value))}
+          />
+        </div>
+        <button className="btn btn-primary btn-sm" onClick={applyFilter}>
           Aplicar
         </button>
       </div>
-      <div className="d-flex justify-content-center mb-4">
+    </div>
+
+    {/* Botões de Navegação por Página */}
+    <div className="col-md-3 text-center text-md-end">
+      <div className="d-flex justify-content-center justify-content-md-end gap-2">
         {[...new Set(rooms.map((room) => room.location))].map((page) => (
           <button
             key={page}
-            className={`btn ${currentPage === parseInt(page) ? "btn-primary" : "btn-outline-primary"
-              } mx-2`}
+            className={`btn btn-sm ${currentPage === parseInt(page) ? "btn-primary" : "btn-outline-primary"
+              }`}
             onClick={() => setCurrentPage(parseInt(page))}
           >
             Página {page}
           </button>
         ))}
       </div>
+    </div>
+  </div>
+</div>
 
       <div className="table-responsive">
         <table className="table table-bordered">
-          <thead>
+        <thead>
             <tr>
             <th className="room-column">Quartos</th>
           {daysOfWeek.map((day) => (
