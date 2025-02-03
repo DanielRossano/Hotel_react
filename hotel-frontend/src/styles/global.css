@@ -1,0 +1,55 @@
+:root {
+  --sidebar-bg-color: whitesmoke;
+  --sidebar-text-color: #3a4b61;
+  --sidebar-header-bg-color: #004080;
+  --sidebar-header-text-color: white;
+  --sidebar-link-color: #2d3e50;
+  --sidebar-link-hover-bg-color: lightgray;
+  --sidebar-link-hover-text-color: #004080;
+  --sidebar-icon-color: #004080;
+  --sidebar-icon-hover-color: #0066cc;
+  --overlay-bg-color: rgba(0, 0, 0, 0.5);
+  --background-color: #fff;
+  --box-shadow-color: rgba(0, 0, 0, 0.1);
+  --border-color: #ccc;
+  --color-border: #ccc;
+  --text-color: #000;
+  --primary-color: #004080;
+  --secundary-color: #2693d1;
+  --secundary-color-hover: #0056b3;
+  --available-bg-color: #C1DFF0;
+  --hover-bg-color: #c3e6cb;
+  --reserved-bg-color: #f8c889;
+  --reserved-hover-bg: #E0A458;
+  --color-save-button: #0ab913;
+  --color-cancel-button: #ec0b0b;
+  --color-list-border: #000000;
+  --color-save-hover: #24922a;
+  --color-cancel-hover: #cc0000;
+  --color-placeholder: #999;
+  --color-modal-background: #ffffff;
+  --color-modal-text: #333333;
+  --modal-header-bg-color: #ffffff;
+  --modal-header-border-color: #000000;
+  --modal-footer-bg-color: #ffffff;
+  --modal-footer-border-color: #000000;
+  --modal-footer-secondary-bg-color: #6c757d;
+  --modal-footer-secondary-text-color: #fff;
+  --modal-footer-primary-bg-color: #004080;
+  --modal-footer-primary-text-color: #fff;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #f3f3f3;
+  color: var(--text-color);
+}
+
+label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+

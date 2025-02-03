@@ -3,7 +3,6 @@ const router = express.Router();
 const db = require('../db/connection');
 const moment = require('moment');
 
-// Listar todas as reservas
 router.get('/', async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -18,12 +17,10 @@ router.get('/', async (req, res) => {
     `);
     res.json(rows);
   } catch (error) {
-    console.error('Erro ao buscar reservas:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Cadastrar nova reserva
 router.post('/', async (req, res) => {
   const { room_id, guest_id, start_date, end_date, daily_rate, custom_name } = req.body;
 
@@ -76,12 +73,10 @@ router.post('/', async (req, res) => {
       custom_name,
     });
   } catch (error) {
-    console.error('Erro ao cadastrar reserva:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Atualizar reserva
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { room_id, guest_id, start_date, end_date, daily_rate, custom_name } = req.body;
@@ -93,6 +88,21 @@ router.put('/:id', async (req, res) => {
   try {
     const formattedStartDate = moment(start_date).format('YYYY-MM-DD HH:mm:ss');
     const formattedEndDate = moment(end_date).format('YYYY-MM-DD HH:mm:ss');
+
+    const [conflictingReservations] = await db.query(`
+      SELECT * FROM reservations 
+      WHERE room_id = ? 
+      AND id != ?
+      AND (
+        (start_date <= ? AND end_date >= ?) OR 
+        (start_date <= ? AND end_date >= ?) OR 
+        (start_date >= ? AND end_date <= ?)
+      )
+    `, [room_id, id, formattedEndDate, formattedStartDate, formattedStartDate, formattedEndDate, formattedStartDate, formattedEndDate]);
+
+    if (conflictingReservations.length > 0) {
+      return res.status(400).json({ error: 'O quarto já está reservado para o período selecionado.' });
+    }
 
     const start = moment(formattedStartDate).startOf('day');
     const end = moment(formattedEndDate).startOf('day');
@@ -116,12 +126,10 @@ router.put('/:id', async (req, res) => {
 
     res.json({ message: 'Reserva atualizada com sucesso.' });
   } catch (error) {
-    console.error('Erro ao atualizar reserva:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Excluir reserva
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -134,7 +142,6 @@ router.delete('/:id', async (req, res) => {
 
     res.json({ message: 'Reserva cancelada com sucesso.' });
   } catch (error) {
-    console.error('Erro ao cancelar reserva:', error);
     res.status(500).json({ error: error.message });
   }
 });
