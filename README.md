@@ -10,10 +10,10 @@ Siga os passos abaixo para configurar e rodar o projeto localmente:
    ```bash
    https://github.com/DanielRossano/Hotel_react.git
    
-2. **Instalar o Node.js**
-   Certifique-se de ter o Node.js instalado. Você pode baixá-lo [aqui](https://nodejs.org/).
+2. **Instalar o Node.js:**
+   Certifique-se de ter o Node.js instalado. Download [aqui](https://nodejs.org/).
 
-3. **Instalar Dependências**
+3. **Instalar Dependências:**
  Acesse a pasta `hotel-frontend` e instale as dependências:
    ```bash
    cd hotel-frontend
