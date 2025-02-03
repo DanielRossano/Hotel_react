@@ -1,4 +1,4 @@
-# Sistema de Gerenciamento de Hotel
+# Sistema de Gerenciamento de quartos
 
 Este projeto foi desenvolvido para atender às necessidades de um hotel com 30 quartos. Em breve, será adaptado para suportar uma quantidade variável de quartos.
 
