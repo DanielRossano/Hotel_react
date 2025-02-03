@@ -3,6 +3,7 @@ import api from "../services/api";
 import "../styles/checkbox.css";
 import AsyncSelect from "react-select/async";
 import { handleInputChange, calculateTotalAndDays } from "../services/reservationsFunctions";
+import { toast } from "react-toastify";
 
 const AddReservationModal = ({ isOpen, onClose, onSubmit, selectedRoom, selectedDate, guests, modalError }) => {
   const [useCustomName, setUseCustomName] = useState(false);
@@ -141,7 +142,7 @@ const AddReservationModal = ({ isOpen, onClose, onSubmit, selectedRoom, selected
                         setFilteredGuests(options);
                         return options;
                       } catch (error) {
-                        console.error("Erro ao buscar hóspedes:", error);
+                        toast.error("Erro ao buscar hóspedes:", error);
                         return [];
                       }
                     }}
