@@ -14,22 +14,22 @@ Siga os passos abaixo para configurar e rodar o projeto localmente:
    Certifique-se de ter o Node.js instalado. Download [aqui](https://nodejs.org/).
 
 3. **Instalar Dependências:**
- Acesse a pasta `hotel-frontend` e instale as dependências:
+   1. Acesse a pasta `hotel-frontend` e instale as dependências:
    ```bash
    cd hotel-frontend
    npm install
+    ```
 
-Repita o processo para a pasta `hotel-fronbackend`:
-   ```bash
-   cd hotel-backend
-   npm install
- ```
-   
+   2. Repita o processo para a pasta `hotel-fronbackend`:
+      ```bash
+      cd hotel-backend
+      npm install 
+  
 ## Configurar Conexão com o Banco de Dados
 
 ### Instalar MySQL
 
-Certifique-se de ter o MySQL instalado. Você pode baixá-lo [aqui](https://dev.mysql.com/downloads/installer/).
+Certifique-se de ter o MySQL instalado. Download [aqui](https://dev.mysql.com/downloads/installer/).
 
 ### Criar o Banco de Dados
 
@@ -102,7 +102,6 @@ Execute o script SQL abaixo para criar o banco de dados e as tabelas necessária
 ## Configurar Conexão
 
 1. Acesse a pasta `db` dentro de `hotel-backend`(hotel_react/hotel-backend/db):
-
 
 2. Edite o arquivo `connection.js` com os dados de conexão do seu banco de dados.
 
