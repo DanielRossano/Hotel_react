@@ -10,21 +10,20 @@ Siga os passos abaixo para configurar e rodar o projeto localmente:
    ```bash
    https://github.com/DanielRossano/Hotel_react.git
    
-## Instalar o Node.js
+2. **Instalar o Node.js**
+   Certifique-se de ter o Node.js instalado. Você pode baixá-lo [aqui](https://nodejs.org/).
 
-Certifique-se de ter o Node.js instalado. Você pode baixá-lo [aqui](https://nodejs.org/).
-
-## Instalar Dependências
-
-1. Acesse a pasta `hotel-frontend` e instale as dependências:
+3. **Instalar Dependências**
+ Acesse a pasta `hotel-frontend` e instale as dependências:
    ```bash
    cd hotel-frontend
    npm install
 
-2. Repita o processo para a pasta `hotel-fronbackend`:
+Repita o processo para a pasta `hotel-fronbackend`:
    ```bash
    cd hotel-backend
    npm install
+ ```
    
 ## Configurar Conexão com o Banco de Dados
 
@@ -111,16 +110,22 @@ Execute o script SQL abaixo para criar o banco de dados e as tabelas necessária
 
 ### Iniciar o Frontend e o Backend
 
-1. Acesse a pasta `hotel-frontend` e execute:
-   ```bash
-   npm start
+1. **Frontend:**
+   - Acesse a pasta `hotel-frontend` e execute o seguinte comando:
+     ```bash
+     npm start
+     ```
+   - O frontend estará disponível em:  
+     🔗 **http://localhost:3000/**
 
-2. Acesse a pasta `hotel-backend` e execute:
-   ```bash
-   npm start
-## Acesso ao Projeto
+2. **Backend:**
+   - Acesse a pasta `hotel-backend` e execute o seguinte comando:
+     ```bash
+     npm start
+     ```
+---
 
-Após iniciar tanto o frontend quanto o backend, o sistema estará totalmente funcional. Por padrão o fornt estará em execução na porta 3000:
-🔗 http://localhost:3000/
+#### Importante:
+Para que o sistema funcione corretamente, **ambos os terminais (frontend e backend)** devem estar rodando simultaneamente. Certifique-se de manter os dois processos ativos.
 
 
