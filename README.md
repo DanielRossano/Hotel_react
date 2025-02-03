@@ -86,6 +86,18 @@ Execute o script SQL abaixo para criar o banco de dados e as tabelas necessária
      CONSTRAINT `reservations_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`),
      CONSTRAINT `reservations_ibfk_2` FOREIGN KEY (`guest_id`) REFERENCES `guests` (`id`)
    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+   INSERT INTO `rooms` VALUES
+      (1, 'Quarto 1',  100, '1'),  (2, 'Quarto 2',  100, '1'),  (3, 'Quarto 3',  100, '1'),
+      (4, 'Quarto 4',  100, '1'),  (5, 'Quarto 5',  100, '1'),  (6, 'Quarto 6',  100, '1'),
+      (7, 'Quarto 7',  100, '1'),  (8, 'Quarto 8',  100, '1'),  (9, 'Quarto 9',  100, '1'),
+      (10, 'Quarto 10', 100, '1'), (11, 'Quarto 11', 100, '1'), (12, 'Quarto 12', 100, '1'),
+      (13, 'Quarto 13', 100, '1'), (14, 'Quarto 14', 100, '1'), (15, 'Quarto 15', 100, '1'),
+      (16, 'Quarto 16', 150, '2'), (17, 'Quarto 17', 150, '2'), (18, 'Quarto 18', 150, '2'),
+      (19, 'Quarto 19', 150, '2'), (20, 'Quarto 20', 150, '2'), (21, 'Quarto 21', 150, '2'),
+      (22, 'Quarto 22', 150, '2'), (23, 'Quarto 23', 150, '2'), (24, 'Quarto 24', 150, '2'),
+      (25, 'Quarto 25', 150, '2'), (26, 'Quarto 26', 150, '2'), (27, 'Quarto 27', 150, '2'),
+      (28, 'Quarto 28', 150, '2'), (29, 'Quarto 29', 150, '2'), (30, 'Quarto 30', 150, '2');
    ```
 
 ## Configurar Conexão
