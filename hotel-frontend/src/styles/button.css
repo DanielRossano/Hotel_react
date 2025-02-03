@@ -1,0 +1,109 @@
+/* Estilos do botão primário */
+button.btn-primary {
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background-color: var(--secundary-color);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+button.btn-primary:hover {
+  background-color: var(--secundary-color-hover);
+}
+
+button.btn-outline-primary {
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #fff;
+  color: var(--secundary-color);
+  border: 1px solid var(--secundary-color);
+}
+
+/* Estilos do botão secundario */
+button.btn-secundary {
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background-color: var(--secundary-color);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+button.btn-secundary:hover {
+  background-color: var(--secundary-color-hover);
+  color: #ffffff;
+}
+/* Estilos do botão claro */
+button.btn-light {
+  font-size: 14px;
+}
+
+button.btn-light:hover {
+  background-color: var(--secundary-color-hover);
+}
+
+/* Estilo do botão buscar */
+button.btn-buscar {
+  background-color: transparent;
+  color: var(--secundary-color);
+  border-radius: 4px;
+  transition: all 0.3s ease-in-out;
+}
+
+button.btn-buscar:hover {
+  color: var(--secundary-color-hover);
+}
+
+/* estilo do botão limpar */
+button.btn-limpar:hover {
+  background-color: var(--secundary-color);
+  border-color: var(--border-color);
+  color: #ffffff;
+}
+
+button.btn-limpar {
+  background-color: var(--secundary-color);
+  color: #ffffff;
+  border: 2px solid var(--border-color);
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: all 0.3s ease-in-out;
+}
+
+
+/* Estilos do botão sucesso */
+button.btn-sucess {
+  background-color: var(--color-save-button);
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+button.btn-sucess:hover {
+  background-color: var(--color-save-hover);
+  color: #ffffff;
+}
+
+/* 
+button.btn-outline-primary {
+  background-color: #fff;
+  color: #004080;
+  border: 1px solid #004080;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: all 0.3s ease-in-out;
+}
+
+
+button.btn-outline-primary:hover {
+  background-color: #004080;
+  color: #fff;
+}
+*/

@@ -25,3 +25,4 @@ yarn-error.log*
 
 # custom
 connection.js
+hotel-backend/db/connection.js

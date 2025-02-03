@@ -1,0 +1,68 @@
+.modal-content {
+  background-color: var(--color-modal-background);
+  padding: 2%;
+  border-radius: 10px;
+  width: 500px;
+}
+
+.modal-content h5 {
+  font-size: 18px;
+  color: var(--color-modal-text);
+}
+
+.modal-content form label {
+  font-size: 14px;
+  color: var(--color-modal-text);
+}
+
+.modal-content form input,
+.modal-content form select {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  width: 100%;
+}
+
+.modal-content form button {
+  font-size: 12px;
+  padding: 4px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-content form button.btn-sucess {
+  padding: 8px 12px;
+}
+
+.modal-content form button.btn-secundary {
+  padding: 8px 12px;
+}
+
+.modal-content form button.btn-danger {
+  padding: 8px 12px;
+}
+
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+}
+
+.modal-footer .btn-secondary {
+  background-color: var(--modal-footer-secondary-bg-color);
+  color: var(--modal-footer-secondary-text-color);
+}
+
+.modal-footer .btn-primary {
+  background-color: var(--modal-footer-primary-bg-color);
+  color: var(--modal-footer-primary-text-color);
+}
+
+.modal-div div{
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+}

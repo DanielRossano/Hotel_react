@@ -19,8 +19,8 @@ Siga os passos abaixo para configurar e rodar o projeto localmente:
    cd hotel-frontend
    npm install
     ```
+   2. Repita o processo para a pasta `hotel-backend`:
 
-   2. Repita o processo para a pasta `hotel-fronbackend`:
       ```bash
       cd hotel-backend
       npm install 

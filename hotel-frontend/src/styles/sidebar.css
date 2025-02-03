@@ -1,0 +1,84 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100vh;
+  background-color: var(--sidebar-bg-color);
+  color: var(--sidebar-text-color);
+  padding: 0;
+  transition: all 0.3s ease;
+  z-index: 1050;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar-header {
+  background-color: var(--sidebar-header-bg-color);
+  color: var(--sidebar-header-text-color);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-header h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.sidebar-header .close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--sidebar-header-text-color);
+}
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar nav li {
+  margin: 15px 0;
+}
+
+.sidebar nav a {
+  color: var(--sidebar-link-color);
+  text-decoration: none;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  gap: 10px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar nav a i {
+  font-size: 18px;
+  color: var(--sidebar-icon-color);
+}
+
+.sidebar nav a:hover {
+  background-color: var(--sidebar-link-hover-bg-color);
+  color: var(--sidebar-link-hover-text-color);
+}
+
+.sidebar nav a:hover i {
+  color: var(--sidebar-icon-hover-color);
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--overlay-bg-color);
+  z-index: 1049;
+}
