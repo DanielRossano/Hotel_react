@@ -124,7 +124,7 @@ Execute o script SQL abaixo para criar o banco de dados e as tabelas necessária
      ```
 ---
 
-#### Importante:
+#### ⚠️ Importante:
 Para que o sistema funcione corretamente, **ambos os terminais (frontend e backend)** devem estar rodando simultaneamente. Certifique-se de manter os dois processos ativos.
 
 
