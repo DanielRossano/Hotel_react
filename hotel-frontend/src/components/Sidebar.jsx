@@ -13,7 +13,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             ✖
           </button>
         </div>
-
         {/* Navegação */}
         <nav>
           <ul>
@@ -40,7 +39,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </ul>
         </nav>
       </div>
-
       {/* Overlay */}
       {isOpen && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
     </>

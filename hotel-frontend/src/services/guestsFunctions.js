@@ -42,7 +42,6 @@ export const handleAddGuest = async (newGuest, setGuests, setNewGuest, fetchGues
       nome_fantasia: '',
     });
   } catch (error) {
-    console.error('Erro ao cadastrar hóspede:', error);
     toast.error('Erro ao cadastrar hóspede. Tente novamente.');
   }
 };
@@ -62,7 +61,6 @@ export const handleUpdateGuest = async (editGuest, fetchGuests, setEditGuest) =>
 
     setEditGuest(null);
   } catch (error) {
-    console.error('Erro ao atualizar hóspede:', error);
     toast.error('Erro ao atualizar hóspede. Tente novamente.');
   }
 };

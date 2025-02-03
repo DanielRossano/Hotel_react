@@ -28,7 +28,6 @@ const ReservationsPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editReservation, setEditReservation] = useState(null);
 
-  // **Carregar Dados Iniciais**
   useEffect(() => {
     const fetchData = async () => {
       try {

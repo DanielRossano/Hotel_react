@@ -64,7 +64,7 @@ const EditGuestModal = ({ editGuest, setEditGuest, handleUpdateGuest, handleDele
           modalBootstrap.hide();
         }
       } catch (error) {
-        console.error("Erro ao excluir hóspede:", error);
+        toast.error(error.response?.data?.error || "Erro ao excluir hóspede.");
       }
     }
   };
@@ -93,7 +93,6 @@ const EditGuestModal = ({ editGuest, setEditGuest, handleUpdateGuest, handleDele
       setShowAddress(true);
       toast.success('Dados do CNPJ encontrados e preenchidos!');
     } catch (error) {
-      console.error('Erro ao buscar CNPJ:', error);
       toast.error(error.response?.data?.error || 'Erro ao buscar CNPJ. Verifique o número e tente novamente.');
     }
   };

@@ -3,7 +3,7 @@ import fetchAddressByCEP from "../services/buscacep";
 
 // Função para aplicar máscara aos valores de entrada
 export const applyMask = (value, mask) => {
-    const cleanValue = value.replace(/\D/g, ""); // Remove caracteres não numéricos
+    const cleanValue = value.replace(/\D/g, ""); 
     let maskedValue = "";
     let cleanIndex = 0;
 
@@ -34,8 +34,9 @@ export const handleInputChange = (value, mask, key, newGuest, setNewGuest) => {
     setNewGuest({ ...newGuest, [key]: maskedValue });
     console.log('Valor atualizado de newGuest:', { ...newGuest, [key]: maskedValue });
   };
-  
-  export const handleAddressChange = (value, field, setNewGuest) => {
+
+  // Função para lidar com mudanças de entrada de endereco
+export const handleAddressChange = (value, field, setNewGuest) => {
     if (!setNewGuest) {
       console.error('setNewGuest não está definido!');
       return;
@@ -52,9 +53,8 @@ export const handleInputChange = (value, mask, key, newGuest, setNewGuest) => {
   
 // Função para lidar com mudanças de CEP
 export const handleCEPChange = async (e, setNewGuest) => {
-    const rawValue = e.target.value.replace(/\D/g, ""); // Remove caracteres não numéricos
-    const maskedValue = applyMask(e.target.value, "99999-999"); // Aplica a máscara de CEP
-
+    const rawValue = e.target.value.replace(/\D/g, "");
+    const maskedValue = applyMask(e.target.value, "99999-999");
    setNewGuest((prev) => ({
         ...prev,   
         address: {
@@ -62,11 +62,9 @@ export const handleCEPChange = async (e, setNewGuest) => {
             cep: maskedValue,
         },
     }));
-
     if (rawValue.length === 8) {
-        // Se o CEP for válido (8 dígitos)
         try {
-            const address = await fetchAddressByCEP(rawValue); // Passa o valor sem máscara para a busca
+            const address = await fetchAddressByCEP(rawValue);
             setNewGuest((prev) => ({
                 ...prev,
                 address: {
@@ -83,5 +81,3 @@ export const handleCEPChange = async (e, setNewGuest) => {
         }
     }
 };
-
-  

@@ -17,7 +17,6 @@ const RoomsPage = () => {
         const roomsData = await fetchRooms();
         setRooms(roomsData);
       } catch (error) {
-        console.error("Erro ao carregar quartos:", error);
         toast.error("Erro ao carregar os quartos.");
       }
     };
@@ -53,7 +52,6 @@ const RoomsPage = () => {
       toast.success("Quarto atualizado com sucesso!");
       cancelEditing();
     } catch (error) {
-      console.error("Erro ao atualizar o quarto:", error);
       toast.error("Erro ao atualizar o quarto.");
     }
   };

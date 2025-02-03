@@ -2,31 +2,29 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/connection');
 
-// Listar todos os hóspedes
 router.get('/', async (req, res) => {
   const { search, type } = req.query;
-try {
-  let query = 'SELECT * FROM guests';
-  const queryParams = [];
+  try {
+    let query = 'SELECT * FROM guests';
+    const queryParams = [];
 
-  if (search) {
-    query += ' WHERE name LIKE ? OR cpf_cnpj LIKE ?';
-    queryParams.push(`%${search}%`, `%${search}%`);
+    if (search) {
+      query += ' WHERE name LIKE ? OR cpf_cnpj LIKE ?';
+      queryParams.push(`%${search}%`, `%${search}%`);
+    }
+
+    if (type) {
+      query += search ? ' AND type = ?' : ' WHERE type = ?';
+      queryParams.push(type);
+    }
+
+    const [rows] = await db.query(query, queryParams);
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  if (type) {
-    query += search ? ' AND type = ?' : ' WHERE type = ?';
-    queryParams.push(type);
-  }
-
-  const [rows] = await db.query(query, queryParams);
-  res.json(rows);
-} catch (error) {
-  console.error('Erro ao listar hóspedes:', error);
-  res.status(500).json({ error: error.message });
-}
 });
-// Cadastrar novo hóspede
+
 router.post('/', async (req, res) => {
   const {
     name,
@@ -37,14 +35,10 @@ router.post('/', async (req, res) => {
     nome_fantasia,
   } = req.body;
 
-  // Verificação adicional
   if (!name || !cpf_cnpj || type === undefined) {
-    return res
-      .status(400)
-      .json({ error: 'Nome, CPF/CNPJ e tipo são obrigatórios.' });
+    return res.status(400).json({ error: 'Nome, CPF/CNPJ e tipo são obrigatórios.' });
   }
 
-  // Certifique-se de que "type" está no formato esperado (0 ou 1)
   const guestType = type === "fisica" ? 0 : 1;
 
   try {
@@ -83,13 +77,10 @@ router.post('/', async (req, res) => {
       type: guestType,
     });
   } catch (error) {
-    console.error('Erro ao cadastrar hóspede:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-
-// Atualizar hóspede
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const {
@@ -139,7 +130,7 @@ router.put('/:id', async (req, res) => {
         numero,
         cep,
         nome_fantasia || null,
-        type === '0' ? 0 : 1, // Converter para booleano
+        type === '0' ? 0 : 1,
         id,
       ]
     );
@@ -150,17 +141,14 @@ router.put('/:id', async (req, res) => {
 
     res.json({ message: 'Hóspede atualizado com sucesso.' });
   } catch (error) {
-    console.error('Erro ao atualizar hóspede:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Deletar hóspede
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Verificar se existem reservas associadas
     const [reservations] = await db.query(
       'SELECT id FROM reservations WHERE guest_id = ?',
       [id]
@@ -172,7 +160,6 @@ router.delete('/:id', async (req, res) => {
       });
     }
 
-    // Excluir o hóspede
     const [result] = await db.query('DELETE FROM guests WHERE id = ?', [id]);
 
     if (result.affectedRows === 0) {
@@ -181,7 +168,6 @@ router.delete('/:id', async (req, res) => {
 
     res.json({ message: 'Hóspede excluído com sucesso.' });
   } catch (error) {
-    console.error('Erro ao excluir hóspede:', error);
     res.status(500).json({ error: error.message });
   }
 });

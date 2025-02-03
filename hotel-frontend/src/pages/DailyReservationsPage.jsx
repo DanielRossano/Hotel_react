@@ -14,9 +14,9 @@ import "../styles/cells.css";
 import "../styles/table.css";
 
 const DailyReservationsControl = () => {
-  const [startDate, setStartDate] = useState(moment().startOf("day")); // Dia atual
-  const [endDate, setEndDate] = useState(moment().add(0, "days").endOf("day")); // Dois dias à frente
-  const [modalError, setModalError] = useState(null); // Estado para armazenar erros no modal
+  const [startDate, setStartDate] = useState(moment().startOf("day"));
+  const [endDate, setEndDate] = useState(moment().add(0, "days").endOf("day"));
+  const [modalError, setModalError] = useState(null);
   const [rooms, setRooms] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [filteredReservations, setFilteredReservations] = useState([]);
@@ -36,7 +36,6 @@ const DailyReservationsControl = () => {
         setFilteredReservations(reservations);
         setGuests(fetchedGuests.data);
       } catch (error) {
-        console.error("Erro ao carregar dados:", error);
         toast.error("Erro ao carregar quartos, reservas ou hóspedes.");
       }
     };
@@ -66,7 +65,6 @@ const DailyReservationsControl = () => {
       setReservations(reservations);
       setFilteredReservations(reservations);
     } catch (error) {
-      console.error("Erro ao recarregar reservas:", error);
       toast.error("Erro ao recarregar reservas.");
     }
   };
@@ -77,18 +75,17 @@ const DailyReservationsControl = () => {
       rooms.slice(10, 20),
       rooms.slice(20, 30),
     ];
-
     return (
       <div className="daily-table-columns">
         {columns.map((column, colIndex) => (
           <div key={colIndex} className="daily-column">
             <table className="daily-table">
-            <thead>
-            <tr>
-            <th className="room-column">Quartos</th>
-            <th className="room-column">Status</th>
-            </tr>
-          </thead>
+              <thead>
+                <tr>
+                  <th className="room-column">Quartos</th>
+                  <th className="room-column">Status</th>
+                </tr>
+              </thead>
               <tbody>
                 {column.map((room) => (
                   <tr key={room.id}>
@@ -163,7 +160,7 @@ const DailyReservationsControl = () => {
         roomReservation?.custom_name || roomReservation?.guest_name || "",
         roomReservation ? moment(roomReservation.start_date).format("DD/MM HH:mm") : "",
         roomReservation ? moment(roomReservation.end_date).format("DD/MM HH:mm") : "",
-        "", // Placeholder para consumo
+        "",
         totalAmount !== "-" ? `${parseFloat(totalAmount).toFixed(2)}` : ``,
       ];
     });
@@ -185,7 +182,7 @@ const DailyReservationsControl = () => {
                   text: header.text,
                   bold: true,
                   alignment: AlignmentType.CENTER,
-                  font: { name: "Arial", size: 24 }, // Font size 12
+                  font: { name: "Arial", size: 24 },
                 }),
               ],
               width: { size: header.width, type: WidthType.DXA },
@@ -202,7 +199,7 @@ const DailyReservationsControl = () => {
                       new Paragraph({
                         text: cell,
                         alignment: AlignmentType.CENTER,
-                        font: { name: "Arial", size: 24 }, // Font size 12
+                        font: { name: "Arial", size: 24 },
                       }),
                     ],
                     width: { size: 1666, type: WidthType.DXA },
@@ -256,19 +253,18 @@ const DailyReservationsControl = () => {
     }
     return days;
   };
-  
+
   const renderNextDayStatus = (room, currentDay) => {
-    const nextDay = moment(currentDay).add(1, "day"); // Dia seguinte
+    const nextDay = moment(currentDay).add(1, "day");
     const reservationsForNextDay = filteredReservations.filter(
       (res) =>
         res.room_id === room.id &&
         moment(nextDay).isBetween(res.start_date, res.end_date, "day", "[]")
     );
-  
+
     if (reservationsForNextDay.length > 0) {
       const reservation = reservationsForNextDay[0];
-  
-      // Verifica se é um novo check-in no dia seguinte
+
       if (moment(nextDay).isSame(reservation.start_date, "day")) {
         return (
           <div className="daily-cell daily-next-day-checkin">
@@ -276,8 +272,7 @@ const DailyReservationsControl = () => {
           </div>
         );
       }
-  
-      // Verifica se é um check-out no dia seguinte
+
       if (moment(nextDay).isSame(reservation.end_date, "day")) {
         return (
           <div className="daily-cell daily-next-day-checkout">
@@ -285,16 +280,14 @@ const DailyReservationsControl = () => {
           </div>
         );
       }
-  
-      // Se não for nem check-in nem check-out, é continuidade
+
       return (
         <div className="daily-cell daily-next-day-continue">
           Continua
         </div>
       );
     }
-  
-    // Se não houver reserva no dia seguinte
+
     return (
       <div className="daily-cell daily-next-day-available">
         Livre
@@ -310,13 +303,13 @@ const DailyReservationsControl = () => {
       <header className="daily-header">
         <h1 className="header-title">Controle Diário</h1>
         <div className="date-range">
-        {daysOfWeek.map((day) => (
+          {daysOfWeek.map((day) => (
             <h1 key={day.format('YYYY-MM-DD')}>
               {day.format('ddd DD')}
               <span className="">/{day.format('MMM')}</span>
               <br />
             </h1>
-              ))}
+          ))}
         </div>
         <div className="filter-container">
           <label htmlFor="selectedDate">Data:</label>
@@ -338,13 +331,13 @@ const DailyReservationsControl = () => {
           isOpen={showAddModal}
           onClose={() => {
             setShowAddModal(false);
-            setModalError(null); // Limpa o erro ao fechar o modal
+            setModalError(null);
           }}
           onSubmit={async (newReservation) => {
-            if (!validateReservation(newReservation)) return; // Validação inicial
+            if (!validateReservation(newReservation)) return;
             const result = await handleAddReservation(newReservation, reloadReservations, setModalError);
             if (result) {
-              setShowAddModal(false); // Fecha o modal somente se a reserva for adicionada com sucesso
+              setShowAddModal(false);
             }
           }}
           selectedRoom={selectedRoom}
@@ -360,8 +353,8 @@ const DailyReservationsControl = () => {
           setEditReservation={setEditReservation}
           onClose={async () => {
             setEditReservation(null);
-            await reloadReservations(); // Garante que as reservas sejam recarregadas ao fechar o modal
-            setModalError(null); // Limpa o erro ao fechar o modal
+            await reloadReservations();
+            setModalError(null);
           }}
           onSubmit={async (updatedReservation) => {
             await handleUpdateReservation(updatedReservation, reloadReservations, setEditReservation, setModalError);

@@ -9,7 +9,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
   const [customName, setCustomName] = useState(editReservation?.custom_name || "");
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredGuests, setFilteredGuests] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+
   const [updatedReservation, setUpdatedReservation] = useState({
     ...editReservation,
     room_id: editReservation?.room_id || selectedRoom?.id || "",
@@ -31,13 +31,11 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
         try {
           const response = await api.get(`/guests?search=${searchTerm}`);
           setFilteredGuests(response.data);
-          setShowSuggestions(true);
         } catch (error) {
           console.error("Erro ao buscar hóspedes:", error);
         }
       } else {
         setFilteredGuests([]);
-        setShowSuggestions(false);
       }
     };
 
@@ -86,14 +84,10 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (typeof onSubmit === "function") {
-                  onSubmit({
-                    ...updatedReservation,
-                    custom_name: useCustomName ? customName : null,
-                  });
-                } else {
-                  console.error("Função onSubmit não definida ou inválida!");
-                }
+                onSubmit({
+                  ...updatedReservation,
+                  custom_name: useCustomName ? customName : null,
+                });
               }}
             >
               <div className="mb-3">
@@ -145,7 +139,6 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                         setFilteredGuests(options);
                         return options;
                       } catch (error) {
-                        console.error("Erro ao buscar hóspedes:", error);
                         return [];
                       }
                     }}
@@ -173,10 +166,11 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   >
                     Limpar
                   </button>
-
                 </div>
               </div>
+
               <hr />
+
               <div className="form-check">
                 <input
                   type="checkbox"
@@ -190,6 +184,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   Adicionar nome usual?
                 </label>
               </div>
+
               {useCustomName && (
                 <div className="mb-3">
                   <label htmlFor="customName" className="form-label">
@@ -206,6 +201,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   <hr />
                 </div>
               )}
+
               <div className="mb-3">
                 <label htmlFor="room_id" className="form-label">
                   Quarto:
@@ -219,6 +215,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   onChange={(e) => handleInputChange(e, setUpdatedReservation)}
                 />
               </div>
+
               <div className="mb-3">
                 <label htmlFor="startDate" className="form-label">
                   Data de Início:
@@ -239,6 +236,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   required
                 />
               </div>
+
               <div className="mb-3">
                 <input
                   type="time"
@@ -255,6 +253,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   }
                 />
               </div>
+
               <div className="mb-3">
                 <label htmlFor="endDate" className="form-label">
                   Data de Fim:
@@ -275,6 +274,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   required
                 />
               </div>
+
               <div className="mb-3">
                 <input
                   type="time"
@@ -291,6 +291,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   }
                 />
               </div>
+
               <div className="mb-3">
                 <label>Qtd. Diárias:</label>
                 <input
@@ -301,6 +302,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   readOnly
                 />
               </div>
+
               <div className="mb-3">
                 <label htmlFor="daily_rate" className="form-label">
                   Valor da Diária (R$)
@@ -317,6 +319,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   required
                 />
               </div>
+
               <div className="mb-3">
                 <label htmlFor="total_amount" className="form-label">
                   Valor Total (R$)
@@ -330,12 +333,9 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                   onChange={(e) => handleInputChange(e, setUpdatedReservation)}
                 />
               </div>
+
               <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secundary"
-                  onClick={onClose}
-                >
+                <button type="button" className="btn btn-secondary" onClick={onClose}>
                   Voltar
                 </button>
                 <button
@@ -356,7 +356,7 @@ const EditReservationModal = ({ selectedRoom, selectedDate, onClose, onSubmit, e
                 >
                   Excluir Reserva
                 </button>
-                <button type="submit" className="btn btn-sucess">
+                <button type="submit" className="btn btn-success">
                   Salvar Alterações
                 </button>
               </div>

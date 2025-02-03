@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Sidebar from './Sidebar'; // Importando o componente Sidebar
-import '../styles/header.css'; // Importando o CSS personalizado
+import Sidebar from './Sidebar'; 
+import '../styles/header.css';
 
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
